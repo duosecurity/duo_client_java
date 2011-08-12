@@ -13,15 +13,15 @@ public class DuoVerify {
 	/*
 	 * Add the correct values from a valid Verify API integration
 	 */
-	private static String IKEY = "DI1YYO5DRKW31OCJQ4GZ";
-	private static String SKEY = "vYqbIHlEk1iXK7UnqRf4viUBfPQPeWE5u35eNphE";
-	private static String HOST = "api-eval.duosecurity.com";
+	private static String IKEY = "";
+	private static String SKEY = "";
+	private static String HOST = "";
 	
 	/*
 	 * Enter your phone number for testing 
 	 * and change the message if you wish
 	 */
-	private static String PHONE = "+18106371302";
+	private static String PHONE = ""
 	private static String MESSAGE = "The PIN is <pin>";
 
 	public static void main(String[] args) {
