@@ -34,7 +34,6 @@ public class Http {
 
 		headers = new HeaderGroup();
 		addHeader("Host", host);
-		addHeader("User-Agent", "DuoMobile/1.0");
 
 		params = new ArrayList<NameValuePair>();
 	}
@@ -42,10 +41,15 @@ public class Http {
 	public String executeRequest() throws Exception {
 		HttpResponse response;
 		HttpClient httpclient = new DefaultHttpClient();
-		String url = "https://" + host + uri;
 
+		String url = "https://" + host + uri;
+		String queryString = createQueryString();
+		
 		if (method.equals("GET")) {
-			HttpGet request = new HttpGet(url + "?" + createQueryString());
+			if (queryString.length() > 0) {
+				url += "?" + queryString;
+			}
+			HttpGet request = new HttpGet(url);
 			request.setHeaders(headers.getAllHeaders());
 			response = httpclient.execute(request);
 		} else {
@@ -100,7 +104,6 @@ public class Http {
 		canon += method.toUpperCase() + "\n";
 		canon += host.toLowerCase() + "\n";
 		canon += uri + "\n";
-
 		canon += createQueryString();
 
 		return canon;

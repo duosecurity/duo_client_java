@@ -21,7 +21,7 @@ public class DuoVerify {
 	 * Enter your phone number for testing 
 	 * and change the message if you wish
 	 */
-	private static String PHONE = ""
+	private static String PHONE = "";
 	private static String MESSAGE = "The PIN is <pin>";
 
 	public static void main(String[] args) {

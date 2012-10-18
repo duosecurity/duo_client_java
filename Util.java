@@ -35,7 +35,7 @@ public class Util {
 	static String join(Object[] s, String glue) {
 		int k = s.length;
 		if (k == 0)
-			return null;
+			return "";
 		StringBuilder out = new StringBuilder();
 		out.append(s[0]);
 		for (int x = 1; x < k; ++x)
