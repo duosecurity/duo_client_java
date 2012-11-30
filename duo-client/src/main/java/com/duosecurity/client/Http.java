@@ -20,6 +20,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.message.HeaderGroup;
 
+import org.json.JSONObject;
+
 public class Http {
     private String method;
     private String host;
@@ -38,7 +40,18 @@ public class Http {
         params = new ArrayList<NameValuePair>();
     }
 
-    public String executeRequest() throws Exception {
+    public JSONObject executeRequest() throws Exception {
+        JSONObject result = new JSONObject(executeRequestRaw());
+        if (! result.getString("stat").equals("OK")) {
+            throw new Exception("Duo error code ("
+                                + result.getInt("code")
+                                + "): "
+                                + result.getString("message"));
+        }
+        return result;
+    }
+
+    public String executeRequestRaw() throws Exception {
         HttpResponse response;
         HttpClient httpclient = new DefaultHttpClient();
 
@@ -57,12 +70,6 @@ public class Http {
             request.setHeaders(headers.getAllHeaders());
             request.setEntity(new UrlEncodedFormEntity(params));
             response = httpclient.execute(request);
-        }
-
-        StatusLine valid = response.getStatusLine();
-        int code = valid.getStatusCode();
-        if (code != 200) {
-            throw new Exception("HTTP error code " + Integer.toString(code));
         }
 
         InputStream stream = response.getEntity().getContent();

@@ -72,7 +72,7 @@ public class DuoVerify {
             request.signRequest(cmd.getOptionValue("ikey"),
                                 cmd.getOptionValue("skey"));
 
-            result = new JSONObject(request.executeRequest());
+            result = request.executeRequest();
             request = null; // cleanup the request object
 
             if(result.getString("stat").equals("OK")){
@@ -93,7 +93,7 @@ public class DuoVerify {
                         request.signRequest(cmd.getOptionValue("ikey"),
                                             cmd.getOptionValue("skey"));
 
-                        result = new JSONObject(request.executeRequest());
+                        result = request.executeRequest();
                         state = result.getJSONObject("response").getString("state");
                         info = result.getJSONObject("response").getString("info");
 
