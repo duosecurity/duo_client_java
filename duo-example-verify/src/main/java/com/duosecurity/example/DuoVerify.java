@@ -70,7 +70,8 @@ public class DuoVerify {
                              cmd.getOptionValue("phone"));
             request.addParam("message", MESSAGE);
             request.signRequest(cmd.getOptionValue("ikey"),
-                                cmd.getOptionValue("skey"));
+                                cmd.getOptionValue("skey"),
+                                1);
 
             result = request.executeRequest();
             request = null; // cleanup the request object
@@ -91,7 +92,8 @@ public class DuoVerify {
                                            "/verify/v1/status.json");
                         request.addParam("txid", txid);
                         request.signRequest(cmd.getOptionValue("ikey"),
-                                            cmd.getOptionValue("skey"));
+                                            cmd.getOptionValue("skey"),
+                                            1);
 
                         result = request.executeRequest();
                         state = result.getJSONObject("response").getString("state");

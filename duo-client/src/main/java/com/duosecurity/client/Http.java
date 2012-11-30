@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -28,6 +31,10 @@ public class Http {
     private String uri;
     private HeaderGroup headers;
     private ArrayList<NameValuePair> params;
+
+    public static SimpleDateFormat RFC_2822_DATE_FORMAT
+        = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z",
+                               Locale.US);
 
     public Http(String in_method, String in_host, String in_uri) {
         method = in_method;
@@ -78,14 +85,20 @@ public class Http {
     }
 
     public void signRequest(String ikey, String skey) {
-        String sig;
-        String canon = canonRequest();
+        signRequest(ikey, skey, 2);
+    }
 
-        sig = signHMAC(skey, canon);
+    public void signRequest(String ikey, String skey, int sig_version) {
+        String date = RFC_2822_DATE_FORMAT.format(new Date());
+        String canon = canonRequest(date, sig_version);
+        String sig = signHMAC(skey, canon);
 
         String auth = ikey + ":" + sig;
         String header = "Basic " + Base64.encodeBytes(auth.getBytes());
         addHeader("Authorization", header);
+        if (sig_version == 2) {
+            addHeader("Date", date);
+        }
     }
 
     private String signHMAC(String skey, String msg) {
@@ -106,8 +119,11 @@ public class Http {
         params.add(new BasicNameValuePair(name, value));
     }
 
-    private String canonRequest() {
+    private String canonRequest(String date, int sig_version) {
         String canon = "";
+        if (sig_version == 2) {
+            canon += date + "\n";
+        }
         canon += method.toUpperCase() + "\n";
         canon += host.toLowerCase() + "\n";
         canon += uri + "\n";
