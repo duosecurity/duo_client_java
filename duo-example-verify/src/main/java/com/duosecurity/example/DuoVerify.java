@@ -8,36 +8,69 @@ package com.duosecurity.example;
 
 import org.json.JSONObject;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+
 import com.duosecurity.client.Http;
 
 public class DuoVerify {
-
-    /*
-     * Add the correct values from a valid Verify API integration
-     */
-    private static String IKEY = "";
-    private static String SKEY = "";
-    private static String HOST = "";
-
-    /*
-     * Enter your phone number for testing
-     * and change the message if you wish
-     */
-    private static String PHONE = "";
     private static String MESSAGE = "The PIN is <pin>";
 
     public static void main(String[] args) {
         System.out.println("Duo Verify Demo");
+
+        Options options = new Options();
+        Option opt;
+        opt = new Option("host", true, "API hostname");
+        opt.setRequired(true);
+        options.addOption(opt);
+        opt = new Option("ikey", true, "Verify integration key");
+        opt.setRequired(true);
+        options.addOption(opt);
+        opt = new Option("skey", true, "Secret key");
+        opt.setRequired(true);
+        options.addOption(opt);
+        opt = new Option("phone", true, "E.164-formatted phone number");
+        opt.setRequired(true);
+        options.addOption(opt);
+        options.addOption("help", false, "Print this message");
+
+        CommandLineParser parser = new PosixParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+        try {
+            cmd = parser.parse(options, args);
+        }
+        catch (ParseException parseException) {
+            System.err.println(parseException.getMessage());
+            formatter.printHelp("DuoVerify", options);
+            System.exit(1);
+            return;
+        }
+
+        if (cmd.hasOption("help")) {
+            formatter.printHelp("DuoVerify", options);
+            System.exit(0);
+        }
 
         JSONObject result = null;
         String txid = null;
 
         // Make API call for phone verification
         try{
-            Http request = new Http("POST", HOST, "/verify/v1/call.json");
-            request.addParam("phone", PHONE);
+            Http request = new Http("POST",
+                                    cmd.getOptionValue("host"),
+                                    "/verify/v1/call.json");
+            request.addParam("phone",
+                             cmd.getOptionValue("phone"));
             request.addParam("message", MESSAGE);
-            request.signRequest(IKEY, SKEY);
+            request.signRequest(cmd.getOptionValue("ikey"),
+                                cmd.getOptionValue("skey"));
 
             result = new JSONObject(request.executeRequest());
             request = null; // cleanup the request object
@@ -53,9 +86,12 @@ public class DuoVerify {
                     String info = "";
 
                     while(!state.equals("ended")){ // poll until state equals ended
-                        request = new Http("GET", HOST, "/verify/v1/status.json");
+                        request = new Http("GET",
+                                           cmd.getOptionValue("host"),
+                                           "/verify/v1/status.json");
                         request.addParam("txid", txid);
-                        request.signRequest(IKEY, SKEY);
+                        request.signRequest(cmd.getOptionValue("ikey"),
+                                            cmd.getOptionValue("skey"));
 
                         result = new JSONObject(request.executeRequest());
                         state = result.getJSONObject("response").getString("state");
