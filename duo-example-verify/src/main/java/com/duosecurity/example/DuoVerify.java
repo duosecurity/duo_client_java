@@ -73,34 +73,30 @@ public class DuoVerify {
                                 cmd.getOptionValue("skey"),
                                 1);
 
-            result = request.executeRequest();
+            result = (JSONObject)request.executeRequest();
             request = null; // cleanup the request object
 
-            if(result.getString("stat").equals("OK")){
-                result.getJSONObject("response").getString("txid");
+            // Poll the txid for the status of the transaction
+            txid = result.getString("txid");
 
-                // Poll the txid for the status of the transaction
-                txid = result.getJSONObject("response").getString("txid");
+            if (txid != null) {
+                String state = "";
+                String info = "";
 
-                if(txid != null){
-                    String state = "";
-                    String info = "";
+                while (!state.equals("ended")){ // poll until state equals ended
+                    request = new Http("GET",
+                                       cmd.getOptionValue("host"),
+                                       "/verify/v1/status.json");
+                    request.addParam("txid", txid);
+                    request.signRequest(cmd.getOptionValue("ikey"),
+                                        cmd.getOptionValue("skey"),
+                                        1);
 
-                    while(!state.equals("ended")){ // poll until state equals ended
-                        request = new Http("GET",
-                                           cmd.getOptionValue("host"),
-                                           "/verify/v1/status.json");
-                        request.addParam("txid", txid);
-                        request.signRequest(cmd.getOptionValue("ikey"),
-                                            cmd.getOptionValue("skey"),
-                                            1);
+                    result = (JSONObject)request.executeRequest();
+                    state = result.getString("state");
+                    info = result.getString("info");
 
-                        result = request.executeRequest();
-                        state = result.getJSONObject("response").getString("state");
-                        info = result.getJSONObject("response").getString("info");
-
-                        System.out.println("Call status: " +  info);
-                    }
+                    System.out.println("Call status: " +  info);
                 }
             }
         }
