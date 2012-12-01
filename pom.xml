@@ -16,6 +16,7 @@
   <modules>
     <module>duo-client</module>
     <module>duo-example-verify</module>
+    <module>duo-example-admin</module>
   </modules>
 
   <repositories>
