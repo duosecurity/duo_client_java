@@ -16,8 +16,11 @@ import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -59,26 +62,35 @@ public class Http {
     }
 
     public String executeRequestRaw() throws Exception {
-        HttpResponse response;
-        HttpClient httpclient = new DefaultHttpClient();
-
         String url = "https://" + host + uri;
         String queryString = createQueryString();
 
-        if (method.equals("GET")) {
+        HttpRequestBase request;
+        if (method.equals("GET") || method.equals("DELETE")) {
             if (queryString.length() > 0) {
                 url += "?" + queryString;
             }
-            HttpGet request = new HttpGet(url);
-            request.setHeaders(headers.getAllHeaders());
-            response = httpclient.execute(request);
-        } else {
-            HttpPost request = new HttpPost(url);
-            request.setHeaders(headers.getAllHeaders());
-            request.setEntity(new UrlEncodedFormEntity(params));
-            response = httpclient.execute(request);
         }
 
+        if (method.equals("GET")) {
+            request = new HttpGet(url);
+        } else if (method.equals("POST")) { // or PUT (currently unused)
+            HttpEntityEnclosingRequestBase ee_request = new HttpPost(url);
+            ee_request.setEntity(new UrlEncodedFormEntity(params));
+            request = ee_request;
+        } else if (method.equals("DELETE")) {
+            request = new HttpDelete(url);
+        } else {
+            throw new UnsupportedOperationException("Unsupported method: "
+                                                    + method);
+        }
+
+        // finish and execute request
+        request.setHeaders(headers.getAllHeaders());
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpResponse response = httpclient.execute(request);
+
+        // parse response
         InputStream stream = response.getEntity().getContent();
         String buf = streamToString(stream);
         return buf;
