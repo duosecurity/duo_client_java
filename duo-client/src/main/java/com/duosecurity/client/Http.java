@@ -40,7 +40,7 @@ public class Http {
                                Locale.US);
 
     public Http(String in_method, String in_host, String in_uri) {
-        method = in_method;
+        method = in_method.toUpperCase();
         host = in_host;
         uri = in_uri;
 
@@ -113,7 +113,7 @@ public class Http {
         }
     }
 
-    private String signHMAC(String skey, String msg) {
+    protected String signHMAC(String skey, String msg) {
         try {
             byte[] sig_bytes = Util.hmacSha1(skey.getBytes(), msg.getBytes());
             String sig = Util.bytes_to_hex(sig_bytes);
@@ -131,7 +131,7 @@ public class Http {
         params.add(new BasicNameValuePair(name, value));
     }
 
-    private String canonRequest(String date, int sig_version) {
+    protected String canonRequest(String date, int sig_version) {
         String canon = "";
         if (sig_version == 2) {
             canon += date + "\n";
