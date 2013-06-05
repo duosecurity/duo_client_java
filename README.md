@@ -18,9 +18,9 @@ The Duo Auth API provides a low-level API for adding strong two-factor
 authentication to applications that cannot directly display rich web
 content.
 
-For more information see the Duo REST API guide:
+For more information see the Duo Auth API guide:
 
-<http://www.duosecurity.com/docs/duorest>
+<https://www.duosecurity.com/docs/authapi>
 
 # Duo Admin API
 
