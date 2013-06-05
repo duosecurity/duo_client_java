@@ -12,9 +12,9 @@ For more information see the Duo Verify API guide:
 
 <http://www.duosecurity.com/docs/duoverify>
 
-# Duo REST API
+# Duo Auth API
 
-The Duo REST API provides a low-level API for adding strong two-factor
+The Duo Auth API provides a low-level API for adding strong two-factor
 authentication to applications that cannot directly display rich web
 content.
 
