@@ -1,5 +1,6 @@
 package com.duosecurity.client;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,21 +29,37 @@ public class HttpCanonRequestTest {
                                     String[][] params) {
         for (List<String[]> a_params
                  : Collections2.permutations(Arrays.asList(params))) {
+            String actual;
+
             Http h = makeHttp();
             for (String[] kv : a_params) {
                 h.addParam(kv[0], kv[1]);
             }
 
-            Assert.assertEquals("failure - sig_version = 1",
-                                (expected_prefix
-                                 + expected_query_string),
-                                h.canonRequest(date, 1));
 
+            try {
+                actual = h.canonRequest(date, 1);
+            }
+            catch (UnsupportedEncodingException e) {
+                Assert.fail(e.toString());
+                return;
+            }
+            Assert.assertEquals("failure - sig_version = 1",
+                                (expected_prefix + expected_query_string),
+                                actual);
+
+            try {
+                actual = h.canonRequest(date, 2);
+            }
+            catch (UnsupportedEncodingException e) {
+                Assert.fail(e.toString());
+                return;
+            }
             Assert.assertEquals("failure - sig_version = 2",
                                 (date + "\n"
                                  + expected_prefix
                                  + expected_query_string),
-                                h.canonRequest(date, 2));
+                                actual);
         }
     }
 

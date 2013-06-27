@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -96,11 +97,13 @@ public class Http {
         return buf;
     }
 
-    public void signRequest(String ikey, String skey) {
+    public void signRequest(String ikey, String skey)
+      throws UnsupportedEncodingException {
         signRequest(ikey, skey, 2);
     }
 
-    public void signRequest(String ikey, String skey, int sig_version) {
+    public void signRequest(String ikey, String skey, int sig_version)
+      throws UnsupportedEncodingException {
         String date = RFC_2822_DATE_FORMAT.format(new Date());
         String canon = canonRequest(date, sig_version);
         String sig = signHMAC(skey, canon);
@@ -131,7 +134,8 @@ public class Http {
         params.add(new BasicNameValuePair(name, value));
     }
 
-    protected String canonRequest(String date, int sig_version) {
+    protected String canonRequest(String date, int sig_version)
+      throws UnsupportedEncodingException {
         String canon = "";
         if (sig_version == 2) {
             canon += date + "\n";
@@ -167,7 +171,8 @@ public class Http {
         return sb.toString();
     }
 
-    private String createQueryString() {
+    private String createQueryString()
+      throws UnsupportedEncodingException {
         ArrayList<String> args = new ArrayList<String>();
         ArrayList<String> keys = new ArrayList<String>();
 
@@ -180,27 +185,22 @@ public class Http {
         for (String key : keys) {
             for (NameValuePair pair : params) {
                 if (key.equals(pair.getName())) {
-                    try {
-                        String name = URLEncoder
-                            .encode(pair.getName(), "UTF-8")
-                            .replace("+", "%20").replace("*", "%2A")
-                            .replace("%7E", "~");
-                        String value = URLEncoder
-                            .encode(pair.getValue(), "UTF-8")
-                            .replace("+", "%20").replace("*", "%2A")
-                            .replace("%7E", "~");
-                        args.add(name + "=" + value);
-                        break;
-                    } catch (Exception e) {
-                        System.out.println(e.toString());
-                        System.exit(0);
-                    }
-
+                    String name = URLEncoder
+                        .encode(pair.getName(), "UTF-8")
+                        .replace("+", "%20")
+                        .replace("*", "%2A")
+                        .replace("%7E", "~");
+                    String value = URLEncoder
+                        .encode(pair.getValue(), "UTF-8")
+                        .replace("+", "%20")
+                        .replace("*", "%2A")
+                        .replace("%7E", "~");
+                    args.add(name + "=" + value);
+                    break;
                 }
             }
         }
 
         return Util.join(args.toArray(), "&");
-
     }
 }
