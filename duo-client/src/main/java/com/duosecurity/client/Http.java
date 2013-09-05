@@ -104,7 +104,7 @@ public class Http {
 
     public void signRequest(String ikey, String skey, int sig_version)
       throws UnsupportedEncodingException {
-        String date = RFC_2822_DATE_FORMAT.format(new Date());
+        String date = formatDate(new Date());
         String canon = canonRequest(date, sig_version);
         String sig = signHMAC(skey, canon);
 
@@ -124,6 +124,12 @@ public class Http {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    private synchronized String formatDate(Date date) {
+        // Could use ThreadLocal or a pool of format objects instead
+        // depending on the needs of the application.
+        return RFC_2822_DATE_FORMAT.format(date);
     }
 
     public void addHeader(String name, String value) {
