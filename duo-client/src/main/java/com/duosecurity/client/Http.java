@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -22,6 +23,7 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -35,6 +37,7 @@ public class Http {
     private String uri;
     private HeaderGroup headers;
     private ArrayList<NameValuePair> params;
+    private HttpHost proxy;
 
     public static SimpleDateFormat RFC_2822_DATE_FORMAT
         = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z",
@@ -49,6 +52,7 @@ public class Http {
         addHeader("Host", host);
 
         params = new ArrayList<NameValuePair>();
+        proxy = null;
     }
 
     public Object executeRequest() throws Exception {
@@ -86,9 +90,15 @@ public class Http {
                                                     + method);
         }
 
+        // Set up client.
+        HttpClient httpclient = new DefaultHttpClient();
+        if (proxy != null) {
+            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+                                                proxy);
+        }
+
         // finish and execute request
         request.setHeaders(headers.getAllHeaders());
-        HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = httpclient.execute(request);
 
         // parse response
@@ -138,6 +148,11 @@ public class Http {
 
     public void addParam(String name, String value) {
         params.add(new BasicNameValuePair(name, value));
+    }
+
+
+    public void setProxy(String host, int port) {
+        proxy = new HttpHost(host, port, "http");
     }
 
     protected String canonRequest(String date, int sig_version)
