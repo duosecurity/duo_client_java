@@ -15,7 +15,6 @@ import java.util.Locale;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
@@ -29,6 +28,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.message.HeaderGroup;
 
+import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONObject;
 
 public class Http {
@@ -38,6 +38,7 @@ public class Http {
     private HeaderGroup headers;
     private ArrayList<NameValuePair> params;
     private HttpHost proxy;
+    private int timeout = 3 * 60 * 1000;
 
     public static SimpleDateFormat RFC_2822_DATE_FORMAT
         = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z",
@@ -53,6 +54,11 @@ public class Http {
 
         params = new ArrayList<NameValuePair>();
         proxy = null;
+    }
+
+    public Http(String in_method, String in_host, String in_uri, int timeout) {
+      this(in_method, in_host, in_uri);
+      this.timeout = timeout;
     }
 
     public Object executeRequest() throws Exception {
@@ -96,6 +102,9 @@ public class Http {
             httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
                                                 proxy);
         }
+
+        HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), timeout);
+        HttpConnectionParams.setSoTimeout(httpclient.getParams(), timeout);
 
         // finish and execute request
         request.setHeaders(headers.getAllHeaders());
