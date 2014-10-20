@@ -73,47 +73,50 @@ public class Http {
     }
 
     public String executeRequestRaw() throws Exception {
-        String url = "https://" + host + uri;
-        String queryString = createQueryString();
-
-        HttpRequestBase request;
-        if (method.equals("GET") || method.equals("DELETE")) {
-            if (queryString.length() > 0) {
-                url += "?" + queryString;
-            }
-        }
-
-        if (method.equals("GET")) {
-            request = new HttpGet(url);
-        } else if (method.equals("POST")) { // or PUT (currently unused)
-            HttpEntityEnclosingRequestBase ee_request = new HttpPost(url);
-            ee_request.setEntity(new UrlEncodedFormEntity(params));
-            request = ee_request;
-        } else if (method.equals("DELETE")) {
-            request = new HttpDelete(url);
-        } else {
-            throw new UnsupportedOperationException("Unsupported method: "
-                                                    + method);
-        }
-
-        // Set up client.
-        HttpClient httpclient = new DefaultHttpClient();
-        if (proxy != null) {
-            httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-                                                proxy);
-        }
-
-        HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), timeout);
-        HttpConnectionParams.setSoTimeout(httpclient.getParams(), timeout);
-
-        // finish and execute request
-        request.setHeaders(headers.getAllHeaders());
-        HttpResponse response = httpclient.execute(request);
-
+        HttpResponse response = executeHttpRequest();
         // parse response
         InputStream stream = response.getEntity().getContent();
         String buf = streamToString(stream);
         return buf;
+    }
+
+    public HttpResponse executeHttpRequest() throws Exception {
+      String url = "https://" + host + uri;
+      String queryString = createQueryString();
+
+      HttpRequestBase request;
+      if (method.equals("GET") || method.equals("DELETE")) {
+        if (queryString.length() > 0) {
+          url += "?" + queryString;
+        }
+      }
+
+      if (method.equals("GET")) {
+        request = new HttpGet(url);
+      } else if (method.equals("POST")) { // or PUT (currently unused)
+        HttpEntityEnclosingRequestBase ee_request = new HttpPost(url);
+        ee_request.setEntity(new UrlEncodedFormEntity(params));
+        request = ee_request;
+      } else if (method.equals("DELETE")) {
+        request = new HttpDelete(url);
+      } else {
+        throw new UnsupportedOperationException("Unsupported method: "
+            + method);
+      }
+
+      // Set up client.
+      HttpClient httpclient = new DefaultHttpClient();
+      if (proxy != null) {
+        httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+            proxy);
+      }
+
+      HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), timeout);
+      HttpConnectionParams.setSoTimeout(httpclient.getParams(), timeout);
+
+      // finish and execute request
+      request.setHeaders(headers.getAllHeaders());
+      return httpclient.execute(request);
     }
 
     public void signRequest(String ikey, String skey)
