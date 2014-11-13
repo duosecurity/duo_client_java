@@ -29,7 +29,7 @@ public class Http {
     private Headers.Builder headers;
     Map<String, String> params = new HashMap<String, String>();
     private Proxy proxy;
-    private int timeout = 3 * 60 * 1000;
+    private int timeout = 60;
 
     public static SimpleDateFormat RFC_2822_DATE_FORMAT
         = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z",
