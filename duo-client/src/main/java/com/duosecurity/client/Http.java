@@ -140,10 +140,12 @@ public class Http {
         }
     }
 
-    private synchronized String formatDate(Date date) {
+    private String formatDate(Date date) {
         // Could use ThreadLocal or a pool of format objects instead
         // depending on the needs of the application.
-        return RFC_2822_DATE_FORMAT.format(date);
+        synchronized (RFC_2822_DATE_FORMAT) {
+            return RFC_2822_DATE_FORMAT.format(date);
+        }
     }
 
     public void addHeader(String name, String value) {
