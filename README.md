@@ -1,5 +1,7 @@
 # Overview
 
+[![Build Status](https://travis-ci.org/duosecurity/duo_client_java.svg?branch=master)](https://travis-ci.org/duosecurity/duo_client_java)
+
 **duo_client** - Demonstration client to call Duo API methods
 with Java.
 
