@@ -1,11 +1,11 @@
 package com.duosecurity.client;
 
-import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -97,14 +97,18 @@ public class Http {
           .build();
 
       // Set up client.
-      OkHttpClient httpclient = new OkHttpClient();
+      OkHttpClient.Builder httpbuilder = new OkHttpClient.Builder();
+      
+      httpbuilder.connectTimeout(timeout, TimeUnit.SECONDS);
+      httpbuilder.writeTimeout(timeout, TimeUnit.SECONDS);
+      httpbuilder.readTimeout(timeout, TimeUnit.SECONDS);
+                   
       if (proxy != null) {
-        httpclient.setProxy(proxy);
+        httpbuilder.proxy(proxy);
       }
 
-      httpclient.setConnectTimeout(timeout, TimeUnit.SECONDS);
-      httpclient.setWriteTimeout(timeout, TimeUnit.SECONDS);
-      httpclient.setReadTimeout(timeout, TimeUnit.SECONDS);
+      OkHttpClient httpclient = httpbuilder.build();
+
       // finish and execute request
       builder.headers(headers.build());
       return httpclient.newCall(builder.build())
