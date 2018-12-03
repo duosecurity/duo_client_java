@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import org.apache.commons.cli.CommandLine;
@@ -23,6 +24,8 @@ import org.apache.commons.cli.PosixParser;
 import com.duosecurity.client.Http;
 
 public class DuoAdmin {
+    private static String proxy_host = null;
+    private static int proxy_port = 0;
     public static void main(String[] args) {
         System.out.println("Duo Admin Demo");
 
@@ -60,8 +63,6 @@ public class DuoAdmin {
             System.exit(0);
         }
 
-        String proxy_host = null;
-        int proxy_port = 0;
         if (cmd.hasOption("proxy")) {
             Pattern p = Pattern.compile("^([^:]+):(\\d{1,5})$");
             Matcher m = p.matcher(cmd.getOptionValue("proxy"));
@@ -76,6 +77,13 @@ public class DuoAdmin {
             }
         }
 
+        getAuthenticationAttempts(cmd);
+        getUsersWithPaging(cmd);
+
+        System.out.println("Done with Admin API demo.");
+    }
+
+    private static void getAuthenticationAttempts(CommandLine cmd) {
         JSONObject result = null;
         try {
             // Prepare request.
@@ -107,7 +115,59 @@ public class DuoAdmin {
             System.out.println("error making request");
             System.out.println(e.toString());
         }
+    }
 
-        System.out.println("Done with Admin API demo.");
+    private static void getUsersWithPaging(CommandLine cmd) {
+        JSONObject result;
+        JSONArray response;
+        JSONObject metadata;
+        try {
+            // Prepare request.
+            Http request = new Http("GET", cmd.getOptionValue("host"), "/admin/v1/users");
+            String limit = "10";
+            request.addParam("offset", "0");
+            request.addParam("limit", limit);
+            request.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));
+
+            // Use proxy if one was specified.
+            if (proxy_host != null) {
+                request.setProxy(proxy_host, proxy_port);
+            }
+
+            int offset = 0;
+            boolean hasMoreUsers = true;
+            while (hasMoreUsers) {
+                // Send the request to Duo and parse the response.
+                System.out.println("Fetching " + limit + " users at offset " + offset);
+
+                result = (JSONObject) request.executeJSONRequest();
+                response = result.getJSONArray("response");
+                metadata = result.getJSONObject("metadata");
+
+                if (!metadata.isNull("next_offset")) {
+                    offset = metadata.getInt("next_offset");
+
+                    request = new Http("GET", cmd.getOptionValue("host"), "/admin/v1/users");
+                    request.addParam("offset", Integer.toString(offset));
+                    request.addParam("limit", limit);
+                    request.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));
+
+                    System.out.println("More to fetch: next_offset = " + offset);
+                } else {
+                    hasMoreUsers = false;
+                    System.out.println("Fetch user request done.");
+                }
+
+                // iterate users and print them
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject user = response.getJSONObject(i);
+                    System.out.println("Fetched user: " + user.get("username"));
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("error making request");
+            System.out.println(e.toString());
+        }
     }
 }

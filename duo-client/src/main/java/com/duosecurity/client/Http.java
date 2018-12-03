@@ -54,6 +54,11 @@ public class Http {
     }
 
     public Object executeRequest() throws Exception {
+        JSONObject result = (JSONObject)executeJSONRequest();
+        return result.get("response");
+    }
+
+    public Object executeJSONRequest() throws Exception {
         JSONObject result = new JSONObject(executeRequestRaw());
         if (! result.getString("stat").equals("OK")) {
             throw new Exception("Duo error code ("
@@ -61,8 +66,10 @@ public class Http {
                                 + "): "
                                 + result.getString("message"));
         }
-        return result.get("response");
+        return result;
     }
+
+
 
     public String executeRequestRaw() throws Exception {
         Response response = executeHttpRequest();
