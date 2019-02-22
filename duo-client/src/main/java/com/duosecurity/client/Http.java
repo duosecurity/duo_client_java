@@ -11,18 +11,17 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
 public class Http {
+    public final static int MAX_REQUEST_ATTEMPTS = 8;
+    public final static int BACKOFF_FACTOR = 2;
+    public final static int MAX_BACKOFF_MS = 32000;
+
     private String method;
     private String host;
     private String uri;
@@ -30,6 +29,8 @@ public class Http {
     Map<String, String> params = new HashMap<String, String>();
     private Proxy proxy;
     private int timeout = 60;
+    private Random random = new Random();
+    private OkHttpClient httpClient;
 
     public static SimpleDateFormat RFC_2822_DATE_FORMAT
         = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z",
@@ -45,12 +46,19 @@ public class Http {
         headers = new Headers.Builder();
         headers.add("Host", host);
 
+        httpClient = new OkHttpClient();
         proxy = null;
+        if (proxy != null) {
+            httpClient.setProxy(proxy);
+        }
+        httpClient.setConnectTimeout(timeout, TimeUnit.SECONDS);
+        httpClient.setWriteTimeout(timeout, TimeUnit.SECONDS);
+        httpClient.setReadTimeout(timeout, TimeUnit.SECONDS);
     }
 
     public Http(String in_method, String in_host, String in_uri, int timeout) {
-      this(in_method, in_host, in_uri);
-      this.timeout = timeout;
+        this(in_method, in_host, in_uri);
+        this.timeout = timeout;
     }
 
     public Object executeRequest() throws Exception {
@@ -68,8 +76,6 @@ public class Http {
         }
         return result;
     }
-
-
 
     public String executeRequestRaw() throws Exception {
         Response response = executeHttpRequest();
@@ -100,22 +106,28 @@ public class Http {
             + method);
       }
 
-      Request request = builder.url(url)
-          .build();
+      // finish and execute request
+      Request request = builder.headers(headers.build()).url(url).build();
+      return executeRequest(request);
+    }
 
-      // Set up client.
-      OkHttpClient httpclient = new OkHttpClient();
-      if (proxy != null) {
-        httpclient.setProxy(proxy);
+    private Response executeRequest(Request request) throws Exception {
+      Response response = httpClient.newCall(request).execute();
+      int attempts = 1;
+      while (attempts < MAX_REQUEST_ATTEMPTS && response.code() == 429) {
+        sleep(Math.min(
+          (int) (Math.pow(BACKOFF_FACTOR, (attempts - 1)) * 1000) + random.nextInt(1000),
+          MAX_BACKOFF_MS
+        ));
+        response = httpClient.newCall(request).execute();
+        attempts++;
       }
 
-      httpclient.setConnectTimeout(timeout, TimeUnit.SECONDS);
-      httpclient.setWriteTimeout(timeout, TimeUnit.SECONDS);
-      httpclient.setReadTimeout(timeout, TimeUnit.SECONDS);
-      // finish and execute request
-      builder.headers(headers.build());
-      return httpclient.newCall(builder.build())
-          .execute();
+      return response;
+    }
+
+    protected void sleep(long ms) throws Exception {
+        Thread.sleep(ms);
     }
 
     public void signRequest(String ikey, String skey)
