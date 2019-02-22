@@ -21,14 +21,13 @@ public class Http {
     public final static int MAX_REQUEST_ATTEMPTS = 8;
     public final static int BACKOFF_FACTOR = 2;
     public final static int MAX_BACKOFF_MS = 32000;
+    public final static int DEFAULT_TIMEOUT_SECS = 60;
 
     private String method;
     private String host;
     private String uri;
     private Headers.Builder headers;
     Map<String, String> params = new HashMap<String, String>();
-    private Proxy proxy;
-    private int timeout = 60;
     private Random random = new Random();
     private OkHttpClient httpClient;
 
@@ -39,6 +38,10 @@ public class Http {
     public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
 
     public Http(String in_method, String in_host, String in_uri) {
+        this(in_method, in_host, in_uri, DEFAULT_TIMEOUT_SECS);
+    }
+
+    public Http(String in_method, String in_host, String in_uri, int timeout) {
         method = in_method.toUpperCase();
         host = in_host;
         uri = in_uri;
@@ -47,18 +50,9 @@ public class Http {
         headers.add("Host", host);
 
         httpClient = new OkHttpClient();
-        proxy = null;
-        if (proxy != null) {
-            httpClient.setProxy(proxy);
-        }
         httpClient.setConnectTimeout(timeout, TimeUnit.SECONDS);
         httpClient.setWriteTimeout(timeout, TimeUnit.SECONDS);
         httpClient.setReadTimeout(timeout, TimeUnit.SECONDS);
-    }
-
-    public Http(String in_method, String in_host, String in_uri, int timeout) {
-        this(in_method, in_host, in_uri);
-        this.timeout = timeout;
     }
 
     public Object executeRequest() throws Exception {
@@ -115,15 +109,17 @@ public class Http {
       Response response = httpClient.newCall(request).execute();
       int attempts = 1;
       while (attempts < MAX_REQUEST_ATTEMPTS && response.code() == 429) {
-        sleep(Math.min(
-          (int) (Math.pow(BACKOFF_FACTOR, (attempts - 1)) * 1000) + random.nextInt(1000),
-          MAX_BACKOFF_MS
-        ));
+        sleep(getBackoffMs(attempts));
         response = httpClient.newCall(request).execute();
         attempts++;
       }
 
       return response;
+    }
+
+    private long getBackoffMs(int requestAttempts) {
+        long exponentialBackoffMs = (long) Math.pow(BACKOFF_FACTOR, (requestAttempts - 1)) * 1000;
+        return Math.min(exponentialBackoffMs, MAX_BACKOFF_MS) + random.nextInt(1000);
     }
 
     protected void sleep(long ms) throws Exception {
@@ -176,7 +172,9 @@ public class Http {
     }
 
     public void setProxy(String host, int port) {
-        proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+        this.httpClient.setProxy(
+            new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port))
+        );
     }
 
     protected String canonRequest(String date, int sig_version)

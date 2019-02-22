@@ -42,7 +42,6 @@ public class HttpRateLimitRetryTest {
         httpClientField.setAccessible(true);
         httpClientField.set(http, httpClient);
 
-
         Mockito.when(random.nextInt(1000)).thenReturn(RANDOM_INT);
         Mockito.doNothing().when(http).sleep(Mockito.any(Long.class));
     }
@@ -125,7 +124,7 @@ public class HttpRateLimitRetryTest {
         assertEquals(4000L + RANDOM_INT, (long) sleepTimes.get(2));
         assertEquals(8000L + RANDOM_INT, (long) sleepTimes.get(3));
         assertEquals(16000L + RANDOM_INT, (long) sleepTimes.get(4));
-        assertEquals(32000L, (long) sleepTimes.get(5));
-        assertEquals(32000L, (long) sleepTimes.get(6));
+        assertEquals(32000L + RANDOM_INT, (long) sleepTimes.get(5));
+        assertEquals(32000L + RANDOM_INT, (long) sleepTimes.get(6));
     }
 }
