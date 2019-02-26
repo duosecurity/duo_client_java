@@ -18,10 +18,11 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 
 public class Http {
-    public final static int MAX_REQUEST_ATTEMPTS = 8;
+    public final static int MAX_REQUEST_ATTEMPTS = 7;
     public final static int BACKOFF_FACTOR = 2;
     public final static int MAX_BACKOFF_MS = 32000;
     public final static int DEFAULT_TIMEOUT_SECS = 60;
+    private final static int RATE_LIMIT_ERROR_CODE = 429;
 
     private String method;
     private String host;
@@ -108,7 +109,7 @@ public class Http {
     private Response executeRequest(Request request) throws Exception {
       Response response = httpClient.newCall(request).execute();
       int attempts = 1;
-      while (attempts < MAX_REQUEST_ATTEMPTS && response.code() == 429) {
+      while (attempts < MAX_REQUEST_ATTEMPTS && response.code() == RATE_LIMIT_ERROR_CODE) {
         sleep(getBackoffMs(attempts));
         response = httpClient.newCall(request).execute();
         attempts++;

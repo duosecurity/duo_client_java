@@ -125,6 +125,5 @@ public class HttpRateLimitRetryTest {
         assertEquals(8000L + RANDOM_INT, (long) sleepTimes.get(3));
         assertEquals(16000L + RANDOM_INT, (long) sleepTimes.get(4));
         assertEquals(32000L + RANDOM_INT, (long) sleepTimes.get(5));
-        assertEquals(32000L + RANDOM_INT, (long) sleepTimes.get(6));
     }
 }
