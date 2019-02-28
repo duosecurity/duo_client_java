@@ -104,9 +104,15 @@ public class HttpRateLimitRetryTest {
             }
         });
 
+        // It will take 7 total requests before the client hits the max backoff.
+        // Once we hit the max backoff, we just assume the request will never work
+        // and we return the rate limited response.
+        int totalRequestCount = 7;
+        int requestRetryCount = totalRequestCount - 1;
+
         Response actualRes = http.executeHttpRequest();
-        assertEquals(Http.MAX_REQUEST_ATTEMPTS, responses.size());
-        assertEquals(Http.MAX_REQUEST_ATTEMPTS, calls.size());
+        assertEquals(totalRequestCount, responses.size());
+        assertEquals(totalRequestCount, calls.size());
         assertEquals(responses.get(responses.size() - 1), actualRes);
 
         // Verify execution of the new calls
@@ -114,9 +120,10 @@ public class HttpRateLimitRetryTest {
             Mockito.verify(call).execute();
         }
 
-        // Verify the calls to sleep on failures
+        // Verify the calls to sleep on failures. We will sleep before every retry,
+        // which means there will be one less sleep then the number of requests made
         ArgumentCaptor<Long> sleepCapture = ArgumentCaptor.forClass(Long.class);
-        Mockito.verify(http, Mockito.times(Http.MAX_REQUEST_ATTEMPTS - 1))
+        Mockito.verify(http, Mockito.times(requestRetryCount))
                 .sleep(sleepCapture.capture());
         List<Long> sleepTimes = sleepCapture.getAllValues();
         assertEquals(1000L + RANDOM_INT, (long) sleepTimes.get(0));
