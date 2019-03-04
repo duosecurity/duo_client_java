@@ -11,25 +11,26 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
 public class Http {
+    public final static int BACKOFF_FACTOR = 2;
+    public final static int INITIAL_BACKOFF_MS = 1000;
+    public final static int MAX_BACKOFF_MS = 32000;
+    public final static int DEFAULT_TIMEOUT_SECS = 60;
+    private final static int RATE_LIMIT_ERROR_CODE = 429;
+
     private String method;
     private String host;
     private String uri;
     private Headers.Builder headers;
     Map<String, String> params = new HashMap<String, String>();
-    private Proxy proxy;
-    private int timeout = 60;
+    private Random random = new Random();
+    private OkHttpClient httpClient;
 
     public static SimpleDateFormat RFC_2822_DATE_FORMAT
         = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z",
@@ -38,6 +39,10 @@ public class Http {
     public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
 
     public Http(String in_method, String in_host, String in_uri) {
+        this(in_method, in_host, in_uri, DEFAULT_TIMEOUT_SECS);
+    }
+
+    public Http(String in_method, String in_host, String in_uri, int timeout) {
         method = in_method.toUpperCase();
         host = in_host;
         uri = in_uri;
@@ -45,12 +50,10 @@ public class Http {
         headers = new Headers.Builder();
         headers.add("Host", host);
 
-        proxy = null;
-    }
-
-    public Http(String in_method, String in_host, String in_uri, int timeout) {
-      this(in_method, in_host, in_uri);
-      this.timeout = timeout;
+        httpClient = new OkHttpClient();
+        httpClient.setConnectTimeout(timeout, TimeUnit.SECONDS);
+        httpClient.setWriteTimeout(timeout, TimeUnit.SECONDS);
+        httpClient.setReadTimeout(timeout, TimeUnit.SECONDS);
     }
 
     public Object executeRequest() throws Exception {
@@ -68,8 +71,6 @@ public class Http {
         }
         return result;
     }
-
-
 
     public String executeRequestRaw() throws Exception {
         Response response = executeHttpRequest();
@@ -100,22 +101,26 @@ public class Http {
             + method);
       }
 
-      Request request = builder.url(url)
-          .build();
-
-      // Set up client.
-      OkHttpClient httpclient = new OkHttpClient();
-      if (proxy != null) {
-        httpclient.setProxy(proxy);
-      }
-
-      httpclient.setConnectTimeout(timeout, TimeUnit.SECONDS);
-      httpclient.setWriteTimeout(timeout, TimeUnit.SECONDS);
-      httpclient.setReadTimeout(timeout, TimeUnit.SECONDS);
       // finish and execute request
-      builder.headers(headers.build());
-      return httpclient.newCall(builder.build())
-          .execute();
+      Request request = builder.headers(headers.build()).url(url).build();
+      return executeRequest(request);
+    }
+
+    private Response executeRequest(Request request) throws Exception {
+        long backoffMs = INITIAL_BACKOFF_MS;
+        while (true) {
+            Response response = httpClient.newCall(request).execute();
+            if (response.code() != RATE_LIMIT_ERROR_CODE || backoffMs > MAX_BACKOFF_MS) {
+                return response;
+            }
+
+            sleep(backoffMs + random.nextInt(1000));
+            backoffMs *= BACKOFF_FACTOR;
+        }
+    }
+
+    protected void sleep(long ms) throws Exception {
+        Thread.sleep(ms);
     }
 
     public void signRequest(String ikey, String skey)
@@ -164,7 +169,9 @@ public class Http {
     }
 
     public void setProxy(String host, int port) {
-        proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+        this.httpClient.setProxy(
+            new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port))
+        );
     }
 
     protected String canonRequest(String date, int sig_version)
