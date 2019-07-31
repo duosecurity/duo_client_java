@@ -30,16 +30,24 @@ public class Util {
         return result;
     }
 
-    // Taken from:
-    // http://stackoverflow.com/questions/1515437/java-function-for-arrays-like-phps-join/1515548#1515548
-    static String join(Object[] s, String glue) {
-        int k = s.length;
-        if (k == 0)
+    public static String join(Object[] s, String joiner) {
+        int itemCount = s.length;
+        if (itemCount == 0) {
+
+
             return "";
+        }
+
         StringBuilder out = new StringBuilder();
         out.append(s[0]);
-        for (int x = 1; x < k; ++x)
-            out.append(glue).append(s[x]);
+
+        for (int x = 1; x < itemCount; x++) {
+            String item = (String) s[x];
+            if (!"".equals(item)) {
+                out.append(joiner).append(item);
+            }
+        }
+
         return out.toString();
     }
 }
