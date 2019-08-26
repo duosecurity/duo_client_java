@@ -7,19 +7,13 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Util {
-    public static byte[] hmacSha1(byte[] key_bytes, byte[] text_bytes)
+    public static byte[] hmac(String algorithm,
+                              byte[] key_bytes, byte[] text_bytes)
         throws NoSuchAlgorithmException, InvalidKeyException {
-        Mac hmacSha1;
-
-        try {
-            hmacSha1 = Mac.getInstance("HmacSHA1");
-        } catch (NoSuchAlgorithmException nsae) {
-            hmacSha1 = Mac.getInstance("HMAC-SHA-1");
-        }
-
+        Mac hmac = Mac.getInstance(algorithm);
         SecretKeySpec macKey = new SecretKeySpec(key_bytes, "RAW");
-        hmacSha1.init(macKey);
-        return hmacSha1.doFinal(text_bytes);
+        hmac.init(macKey);
+        return hmac.doFinal(text_bytes);
     }
 
     public static String bytes_to_hex(byte[] b) {
