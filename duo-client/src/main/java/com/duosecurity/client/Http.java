@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URLEncoder;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,6 +28,7 @@ public class Http {
     private String method;
     private String host;
     private String uri;
+    private String signingAlgorithm;
     private Headers.Builder headers;
     Map<String, String> params = new HashMap<String, String>();
     private Random random = new Random();
@@ -46,6 +48,7 @@ public class Http {
         method = in_method.toUpperCase();
         host = in_host;
         uri = in_uri;
+        signingAlgorithm = "HmacSHA1";
 
         headers = new Headers.Builder();
         headers.add("Host", host);
@@ -144,7 +147,9 @@ public class Http {
 
     protected String signHMAC(String skey, String msg) {
         try {
-            byte[] sig_bytes = Util.hmacSha1(skey.getBytes(), msg.getBytes());
+            byte[] sig_bytes = Util.hmac(signingAlgorithm,
+                                         skey.getBytes(),
+                                         msg.getBytes());
             String sig = Util.bytes_to_hex(sig_bytes);
             return sig;
         } catch (Exception e) {
@@ -172,6 +177,14 @@ public class Http {
         this.httpClient.setProxy(
             new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port))
         );
+    }
+
+    public void setSigningAlgorithm(String algorithm)
+      throws NoSuchAlgorithmException {
+        if (algorithm != "HmacSHA1" && algorithm != "HmacSHA512") {
+            throw new NoSuchAlgorithmException(algorithm);
+        }
+        signingAlgorithm = algorithm;
     }
 
     protected String canonRequest(String date, int sig_version)
