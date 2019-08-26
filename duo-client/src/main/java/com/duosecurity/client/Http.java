@@ -25,6 +25,9 @@ public class Http {
     public final static int DEFAULT_TIMEOUT_SECS = 60;
     private final static int RATE_LIMIT_ERROR_CODE = 429;
 
+    public final static String HmacSHA1 = "HmacSHA1";
+    public final static String HmacSHA512 = "HmacSHA512";
+
     private String method;
     private String host;
     private String uri;
@@ -181,7 +184,7 @@ public class Http {
 
     public void setSigningAlgorithm(String algorithm)
       throws NoSuchAlgorithmException {
-        if (algorithm != "HmacSHA1" && algorithm != "HmacSHA512") {
+        if (algorithm != HmacSHA1 && algorithm != HmacSHA512) {
             throw new NoSuchAlgorithmException(algorithm);
         }
         signingAlgorithm = algorithm;
