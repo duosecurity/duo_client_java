@@ -1,6 +1,10 @@
 # Overview
 
 [![Build Status](https://travis-ci.org/duosecurity/duo_client_java.svg?branch=master)](https://travis-ci.org/duosecurity/duo_client_java)
+[![Issues](https://img.shields.io/github/issues/duosecurity/duo_client_java)](https://github.com/duosecurity/duo_client_java/issues)
+[![Forks](https://img.shields.io/github/forks/duosecurity/duo_client_java)](https://github.com/duosecurity/duo_client_java/network/members)
+[![Stars](https://img.shields.io/github/stars/duosecurity/duo_client_java)](https://github.com/duosecurity/duo_client_java/stargazers)
+[![License](https://img.shields.io/badge/License-View%20License-orange)](https://github.com/duosecurity/duo_client_java/blob/master/LICENSE)
 
 **duo_client** - Demonstration client to call Duo API methods
 with Java.
