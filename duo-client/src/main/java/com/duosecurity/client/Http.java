@@ -27,6 +27,7 @@ public class Http {
 
     public final static String HmacSHA1 = "HmacSHA1";
     public final static String HmacSHA512 = "HmacSHA512";
+    public final static String UserAgentString = "Duo API Java/0.3.0";
 
     private String method;
     private String host;
@@ -55,6 +56,7 @@ public class Http {
 
         headers = new Headers.Builder();
         headers.add("Host", host);
+        headers.add("user-agent", UserAgentString);
 
         httpClient = new OkHttpClient();
         httpClient.setConnectTimeout(timeout, TimeUnit.SECONDS);
