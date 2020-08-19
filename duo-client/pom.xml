@@ -82,6 +82,20 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <configLocation>google_checks.xml</configLocation>
+          <suppressionsLocation>suppression_checks.xml</suppressionsLocation>
+          <violationSeverity>warning</violationSeverity>
+          <encoding>UTF-8</encoding>
+          <logViolationsToConsole>true</logViolationsToConsole>
+          <failOnViolation>true</failOnViolation>
+          <linkXRef>false</linkXRef>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.10</version>
         <configuration>
