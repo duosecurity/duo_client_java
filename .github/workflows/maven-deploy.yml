@@ -29,7 +29,7 @@ jobs:
 
     - name: Publish to Apache Maven Central
       run: mvn -Dgpg.passphrase=${{ secrets.MAVEN_GPG_PASSPHRASE }} -P release deploy
-      working-directory: ./duo-universal-sdk
+      working-directory: ./duo-client
       env:
         MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
