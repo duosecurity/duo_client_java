@@ -41,7 +41,18 @@ For more information see the Duo Accounts API guide:
 
 # Usage
 
-The Java API Client project is not currently available from Duo Security on Maven.  Currently this GitHub project is the only supported source for the Duo Java API Client.
+The Java API Client project is available from Duo Security on Maven.  Include the following in your dependency definitions:
+```
+
+<!-- https://mvnrepository.com/artifact/com.duosecurity/duo-client -->
+<dependency>
+    <groupId>com.duosecurity</groupId>
+    <artifactId>duo-client</artifactId>
+    <version>0.3.0</version>
+</dependency>
+```
+
+See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.3.0 for more details.
 
 # Testing
 
