@@ -54,6 +54,14 @@ The Java API Client project is available from Duo Security on Maven.  Include th
 
 See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.3.0 for more details.
 
+# Using the Example
+There is an example in $ duo-example-admin
+1. $ java -jar duo-example-admin-0.3.0-jar-with-dependencies.jar
+2. The above command will tell what parameters are required, which include your host, ikey, proxy (not required), and skey.
+3. $ java -jar duo-example-admin-0.3.0-jar-with-dependencies.jar -host <argument> -ikey <argument> -proxy <argument> -skey<argument>
+4. If successful, the console will print the users and authentication attempts.
+
+
 # Testing
 
 ```
