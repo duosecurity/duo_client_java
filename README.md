@@ -56,10 +56,11 @@ See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.3.0 for more
 
 # Using the Example
 There is an example in $ duo-example-admin
-1. $ java -jar duo-example-admin-0.3.0-jar-with-dependencies.jar
-2. The above command will tell what parameters are required, which include your host, ikey, proxy (not required), and skey.
-3. $ java -jar duo-example-admin-0.3.0-jar-with-dependencies.jar -host <argument> -ikey <argument> -proxy <argument> -skey<argument>
-4. If successful, the console will print the users and authentication attempts.
+Create an Admin API application in your DUO Admin Panel. 
+```
+$ java -jar duo-example-admin-0.3.0-jar-with-dependencies.jar -host <host> -ikey <ikey> -skey <skey>
+```
+If successful, the console will print the users and authentication attempts.
 
 
 # Testing
