@@ -55,8 +55,9 @@ The Java API Client project is available from Duo Security on Maven.  Include th
 See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.3.0 for more details.
 
 # Using the Example
-There is an example in $ duo-example-admin
-Create an Admin API application in your DUO Admin Panel. 
+There is an example in /duo-example-admin
+Create an Admin API application in your Duo Admin Panel. 
+To set the minimum permissions, under your API's 'Permissions', check the three boxes that start with "Grant read ...".
 ```
 $ java -jar duo-example-admin-0.3.0-jar-with-dependencies.jar -host <host> -ikey <ikey> -skey <skey>
 ```
