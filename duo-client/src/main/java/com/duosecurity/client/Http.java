@@ -1,11 +1,11 @@
 package com.duosecurity.client;
 
-import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -69,10 +69,11 @@ public class Http {
     headers.add("Host", host);
     headers.add("user-agent", UserAgentString);
 
-    httpClient = new OkHttpClient();
-    httpClient.setConnectTimeout(timeout, TimeUnit.SECONDS);
-    httpClient.setWriteTimeout(timeout, TimeUnit.SECONDS);
-    httpClient.setReadTimeout(timeout, TimeUnit.SECONDS);
+    httpClient = new OkHttpClient.Builder()
+                     .connectTimeout(timeout, TimeUnit.SECONDS)
+                     .writeTimeout(timeout, TimeUnit.SECONDS)
+                     .readTimeout(timeout, TimeUnit.SECONDS)
+                      .build();
   }
 
   /**
@@ -218,9 +219,8 @@ public class Http {
    * @param port    The port of the proxy
    */
   public void setProxy(String host, int port) {
-    this.httpClient.setProxy(
-        new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port))
-    );
+    Proxy httpProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
+    httpClient = httpClient.newBuilder().proxy(httpProxy).build();
   }
 
   /**
