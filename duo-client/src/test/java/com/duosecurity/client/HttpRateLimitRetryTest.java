@@ -1,6 +1,6 @@
 package com.duosecurity.client;
 
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +61,7 @@ public class HttpRateLimitRetryTest {
                         .protocol(Protocol.HTTP_2)
                         .code(responses.isEmpty() ? 429 : 200) // Fail on first req, succeed after
                         .request((Request) invocationOnMock.getArguments()[0])
+                        .message("HTTP 429 or 200")
                         .build();
                 responses.add(resp);
                 Mockito.when(call.execute()).thenReturn(resp);
@@ -96,6 +97,7 @@ public class HttpRateLimitRetryTest {
                         .protocol(Protocol.HTTP_2)
                         .code(429)
                         .request((Request) invocationOnMock.getArguments()[0])
+                        .message("HTTP 429")
                         .build();
                 responses.add(resp);
                 Mockito.when(call.execute()).thenReturn(resp);
