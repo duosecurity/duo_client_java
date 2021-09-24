@@ -20,7 +20,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.internal.tls.OkHostnameVerifier;
 import org.json.JSONObject;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.HostnameVerifier;
 
 public class Http {
   public static final int BACKOFF_FACTOR = 2;
@@ -51,15 +56,21 @@ public class Http {
     this(inMethod, inHost, inUri, DEFAULT_TIMEOUT_SECS);
   }
 
+  public Http(String inMethod, String inHost, String inUri, int timeout) {
+      this(inMethod, inHost, inUri, timeout, OkHostnameVerifier.INSTANCE, SocketFactory.getDefault());
+  }
   /**
    * Http constructor.
    *
-   * @param inMethod    The method for the http request
-   * @param inHost      The api host provided by Duo and found in the Duo admin panel
-   * @param inUri       The endpoint for the request
-   * @param timeout     The timeout for the http request
+   * @param inMethod         The method for the http request
+   * @param inHost           The api host provided by Duo and found in the Duo admin panel
+   * @param inUri            The endpoint for the request
+   * @param timeout          The timeout for the http request
+   * @param hostnameVerifier the hostname verifier
+   * @param socketFactory    the socket factory
    */
-  public Http(String inMethod, String inHost, String inUri, int timeout) {
+  public Http(String inMethod, String inHost, String inUri, int timeout,
+              HostnameVerifier hostnameVerifier, SocketFactory socketFactory) {
     method = inMethod.toUpperCase();
     host = inHost;
     uri = inUri;
@@ -73,7 +84,9 @@ public class Http {
                      .connectTimeout(timeout, TimeUnit.SECONDS)
                      .writeTimeout(timeout, TimeUnit.SECONDS)
                      .readTimeout(timeout, TimeUnit.SECONDS)
-                      .build();
+                     .socketFactory(socketFactory)
+                     .hostnameVerifier(hostnameVerifier)
+                     .build();
   }
 
   /**
