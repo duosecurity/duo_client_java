@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.internal.tls.OkHostnameVerifier;
 import org.json.JSONObject;
 
 import javax.net.SocketFactory;
@@ -57,7 +56,7 @@ public class Http {
   }
 
   public Http(String inMethod, String inHost, String inUri, int timeout) {
-      this(inMethod, inHost, inUri, timeout, OkHostnameVerifier.INSTANCE, SocketFactory.getDefault());
+      this(inMethod, inHost, inUri, timeout, null, null);
   }
   /**
    * Http constructor.
@@ -66,8 +65,8 @@ public class Http {
    * @param inHost           The api host provided by Duo and found in the Duo admin panel
    * @param inUri            The endpoint for the request
    * @param timeout          The timeout for the http request
-   * @param hostnameVerifier the hostname verifier
-   * @param socketFactory    the socket factory
+   * @param hostnameVerifier the hostname verifier; may be null
+   * @param socketFactory    the socket factory; may be null
    */
   public Http(String inMethod, String inHost, String inUri, int timeout,
               HostnameVerifier hostnameVerifier, SocketFactory socketFactory) {
@@ -80,13 +79,18 @@ public class Http {
     headers.add("Host", host);
     headers.add("user-agent", UserAgentString);
 
-    httpClient = new OkHttpClient.Builder()
-                     .connectTimeout(timeout, TimeUnit.SECONDS)
-                     .writeTimeout(timeout, TimeUnit.SECONDS)
-                     .readTimeout(timeout, TimeUnit.SECONDS)
-                     .socketFactory(socketFactory)
-                     .hostnameVerifier(hostnameVerifier)
-                     .build();
+    OkHttpClient.Builder builder = new OkHttpClient.Builder()
+        .connectTimeout(timeout, TimeUnit.SECONDS)
+        .writeTimeout(timeout, TimeUnit.SECONDS)
+        .readTimeout(timeout, TimeUnit.SECONDS);
+
+    if (hostnameVerifier != null) {
+      builder.hostnameVerifier(hostnameVerifier);
+    }
+    if (socketFactory != null) {
+      builder.socketFactory(socketFactory);
+    }
+    httpClient = builder.build();
   }
 
   /**
