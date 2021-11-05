@@ -8,7 +8,7 @@ import com.duosecurity.client.Http;
 
 public class HttpSignHMACTest {
     private static Http makeHttp() {
-        return new Http("get", "API.test", "/v1/tEst");
+        return new Http.HttpBuilder("get", "API.test", "/v1/tEst").Build();
     }
 
     @Test

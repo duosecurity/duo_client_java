@@ -22,7 +22,7 @@ public class HttpCanonRequestTest {
         // deliberately use the "wrong" case for method and host,
         // checking that those get canonicalized but URI's case is
         // preserved.
-        return new Http("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
+        return new Http.HttpBuilder("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux").Build();
     }
 
     private void assertCanonRequest(String expected_query_string,

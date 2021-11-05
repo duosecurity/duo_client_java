@@ -31,7 +31,7 @@ public class HttpRateLimitRetryTest {
 
     @Before
     public void before() throws Exception {
-        http = new Http("GET", "example.test", "/foo/bar");
+        http = new Http.HttpBuilder("GET", "example.test", "/foo/bar").Build();
         http = Mockito.spy(http);
 
         Field randomField = Http.class.getDeclaredField("random");

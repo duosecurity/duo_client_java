@@ -83,7 +83,7 @@ public class DuoAuthLogsV2 {
         JSONObject metadata;
         try {
             // Prepare request.
-            Http request = new Http("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication");
+            Http request = new Http.HttpBuilder("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication").Build();
             String limit = "2";
             long mintime = System.currentTimeMillis() - (180 * 24 * 60 * 60 * 100);
             long maxtime = System.currentTimeMillis();
@@ -112,7 +112,7 @@ public class DuoAuthLogsV2 {
                 if (!metadata.isNull("next_offset")) {
                     System.out.println("Getting more logs...");
 					offset = metadata.getJSONArray("next_offset");
-                    request = new Http("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication");
+                    request = new Http.HttpBuilder("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication").Build();
                     next_offset = offset.get(0).toString() + ',' + offset.get(1).toString();
                     request.addParam("next_offset", next_offset);
                     request.addParam("limit", limit);
