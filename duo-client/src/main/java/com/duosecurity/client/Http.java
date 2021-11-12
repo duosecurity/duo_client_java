@@ -324,7 +324,7 @@ public class Http {
      *
      * @return the specified Http client object
      */
-    public Http Build() {
+    public Http build() {
       Http duoClient = new Http(method, host, uri, timeout);
 
       return duoClient;
