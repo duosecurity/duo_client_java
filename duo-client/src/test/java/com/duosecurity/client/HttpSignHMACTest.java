@@ -4,11 +4,9 @@ import java.security.NoSuchAlgorithmException;
 import org.junit.Test;
 import org.junit.Assert;
 
-import com.duosecurity.client.Http;
-
 public class HttpSignHMACTest {
     private static Http makeHttp() {
-        return new Http.HttpBuilder("get", "API.test", "/v1/tEst").Build();
+        return new Http.HttpBuilder("get", "API.test", "/v1/tEst").build();
     }
 
     @Test
