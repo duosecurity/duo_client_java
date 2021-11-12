@@ -80,8 +80,6 @@ public class Http {
                       .build();
   }
 
-
-
   /**
    * Executes JSON request.
    *
@@ -315,7 +313,7 @@ public class Http {
      * @param timeout: the timeout to use
      * @return the Builder
      */
-    public HttpBuilder UseTimeout(int timeout) {
+    public HttpBuilder useTimeout(int timeout) {
       this.timeout = timeout;
 
       return this;
