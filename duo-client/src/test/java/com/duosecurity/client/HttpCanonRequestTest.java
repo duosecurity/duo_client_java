@@ -1,15 +1,12 @@
 package com.duosecurity.client;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Collections2;
 import org.junit.Test;
 import org.junit.Assert;
-
-import com.duosecurity.client.Http;
 
 public class HttpCanonRequestTest {
     private String date = "Fri, 07 Dec 2012 17:18:00 -0000";
@@ -22,7 +19,7 @@ public class HttpCanonRequestTest {
         // deliberately use the "wrong" case for method and host,
         // checking that those get canonicalized but URI's case is
         // preserved.
-        return new Http("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
+        return new Http.HttpBuilder("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux").build();
     }
 
     private void assertCanonRequest(String expected_query_string,

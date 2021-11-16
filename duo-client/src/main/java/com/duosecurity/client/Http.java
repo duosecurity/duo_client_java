@@ -33,9 +33,9 @@ public class Http {
   public static final String HmacSHA512 = "HmacSHA512";
   public static final String UserAgentString = "Duo API Java/0.4.1-SNAPSHOT";
 
-  private String method;
-  private String host;
-  private String uri;
+  private final String method;
+  private final String host;
+  private final String uri;
   private String signingAlgorithm;
   private Headers.Builder headers;
   Map<String, String> params = new HashMap<String, String>();
@@ -47,6 +47,9 @@ public class Http {
 
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
 
+  /**
+   * @deprecated Use the HttpBuilder instead
+   */
   public Http(String inMethod, String inHost, String inUri) {
     this(inMethod, inHost, inUri, DEFAULT_TIMEOUT_SECS);
   }
@@ -54,6 +57,7 @@ public class Http {
   /**
    * Http constructor.
    *
+   * @deprecated Use the HttpBuilder instead
    * @param inMethod    The method for the http request
    * @param inHost      The api host provided by Duo and found in the Duo admin panel
    * @param inUri       The endpoint for the request
@@ -278,5 +282,52 @@ public class Http {
     }
 
     return Util.join(args.toArray(), "&");
+  }
+
+  /**
+   * Builder for an Http client object
+   */
+  public static class HttpBuilder {
+    private final String method;
+    private final String host;
+    private final String uri;
+
+    private int timeout = DEFAULT_TIMEOUT_SECS;
+
+    /**
+     * Builder entry point
+     *
+     * @param method: the HTTP method to use
+     * @param host: the Duo host
+     * @param uri: the API endpoint for the request
+     */
+    public HttpBuilder(String method, String host, String uri) {
+      this.method = method;
+      this.host = host;
+      this.uri = uri;
+    }
+
+    /**
+     * Set a custom timeout for HTTP calls
+     *
+     * @param timeout: the timeout to use
+     * @return the Builder
+     */
+    public HttpBuilder useTimeout(int timeout) {
+      this.timeout = timeout;
+
+      return this;
+    }
+
+    /**
+     * Build the HTTP client object based on the builder options
+     *
+     * @return the specified Http client object
+     */
+    public Http build() {
+      Http duoClient = new Http(method, host, uri, timeout);
+
+      return duoClient;
+    }
   }
 }
