@@ -1,11 +1,7 @@
 package com.duosecurity.client;
 
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -47,6 +43,29 @@ public class Http {
 
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
 
+  private static final String[] DEFAULT_CA_CERTS = {
+      //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Assured ID Root CA
+      "sha256/I/Lt/z7ekCWanjD0Cvj5EqXls2lOaThEA0H2Bg4BT/o=",
+      //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Global Root CA
+      "sha256/r/mIkG3eEpVdm+u/ko/cwxzOMo1bk4TyHIlByibiA5E=",
+      //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert High Assurance EV Root CA
+      "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=",
+      //C=US, O=SecureTrust Corporation, CN=SecureTrust CA
+      "sha256/dykHF2FLJfEpZOvbOLX4PKrcD2w2sHd/iA/G3uHTOcw=",
+      //C=US, O=SecureTrust Corporation, CN=Secure Global CA
+      "sha256/JZaQTcTWma4gws703OR/KFk313RkrDcHRvUt6na6DCg=",
+      //C=US, O=Amazon, CN=Amazon Root CA 1
+      "sha256/++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=",
+      //C=US, O=Amazon, CN=Amazon Root CA 2
+      "sha256/f0KW/FtqTjs108NpYj42SrGvOB2PpxIVM8nWxjPqJGE=",
+      //C=US, O=Amazon, CN=Amazon Root CA 3
+      "sha256/NqvDJlas/GRcYbcWE8S/IceH9cq77kg0jVhZeAPXq8k=",
+      //C=US, O=Amazon, CN=Amazon Root CA 4
+      "sha256/9+ze1cZgR9KO1kZrVDxA4HQ6voHRCSVNz4RdTCx4U8U=",
+      //C=BM, O=QuoVadis Limited, CN=QuoVadis Root CA 2
+      "sha256/j9ESw8g3DxR9XM06fYZeuN1UB4O6xp/GAIjjdD/zM3g="
+  };
+
   /**
    * @deprecated Use the HttpBuilder instead
    */
@@ -73,11 +92,14 @@ public class Http {
     headers.add("Host", host);
     headers.add("user-agent", UserAgentString);
 
+    CertificatePinner pinner = Util.createPinner(host, DEFAULT_CA_CERTS);
+
     httpClient = new OkHttpClient.Builder()
                      .connectTimeout(timeout, TimeUnit.SECONDS)
                      .writeTimeout(timeout, TimeUnit.SECONDS)
                      .readTimeout(timeout, TimeUnit.SECONDS)
-                      .build();
+                     .certificatePinner(pinner)
+                     .build();
   }
 
   /**
@@ -228,6 +250,16 @@ public class Http {
   }
 
   /**
+   * Use custom CA certificates for certificate pinning
+   *
+   * @param customCaCerts   The CA certificates to pin
+   */
+  public void useCustomCertificates(String[] customCaCerts) {
+    CertificatePinner pinner = Util.createPinner(host, customCaCerts);
+    httpClient = httpClient.newBuilder().certificatePinner(pinner).build();
+  }
+
+  /**
    * Set Signing Algorithm.
    *
    * @param algorithm   The algorith used for signing
@@ -293,6 +325,7 @@ public class Http {
     private final String uri;
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
+    private String[] caCerts = null;
 
     /**
      * Builder entry point
@@ -320,12 +353,27 @@ public class Http {
     }
 
     /**
+     * Provide custom CA certificates for certificate pinning
+     *
+     * @param customCaCerts   The CA certificates to pin to
+     * @return the Builder
+     */
+    public HttpBuilder useCustomCertificates(String[] customCaCerts) {
+      this.caCerts = customCaCerts;
+
+      return this;
+    }
+
+    /**
      * Build the HTTP client object based on the builder options
      *
      * @return the specified Http client object
      */
     public Http build() {
       Http duoClient = new Http(method, host, uri, timeout);
+      if (caCerts != null) {
+        duoClient.useCustomCertificates(caCerts);
+      }
 
       return duoClient;
     }

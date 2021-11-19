@@ -1,5 +1,7 @@
 package com.duosecurity.client;
 
+import okhttp3.CertificatePinner;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
@@ -68,5 +70,20 @@ public class Util {
     }
 
     return out.toString();
+  }
+
+  /**
+   * Create a certificate pinner for the specified CA certificates
+   *
+   * @param apiHost   the host for pinning
+   * @param caCerts   the certificates to pin to
+   * @return a CertificatePinner
+   */
+  public static CertificatePinner createPinner(String apiHost, String[] caCerts) {
+    CertificatePinner pinner = new CertificatePinner.Builder()
+                                                    .add(apiHost, caCerts)
+                                                    .build();
+
+    return pinner;
   }
 }
