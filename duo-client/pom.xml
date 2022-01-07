@@ -5,7 +5,7 @@
 
   <groupId>com.duosecurity</groupId>
   <artifactId>duo-client</artifactId>
-  <version>0.4.1-SNAPSHOT</version>
+  <version>0.5.0</version>
   <name>Duo Security API client</name>
   <url>https://github.com/duosecurity/duo_client_java</url>  
   <description>Two Factor Authentication API Client</description>
