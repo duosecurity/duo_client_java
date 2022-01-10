@@ -27,7 +27,7 @@ public class Http {
 
   public static final String HmacSHA1 = "HmacSHA1";
   public static final String HmacSHA512 = "HmacSHA512";
-  public static final String UserAgentString = "Duo API Java/0.5.0";
+  public static final String UserAgentString = "Duo API Java/0.5.1-SNAPSHOT";
 
   private final String method;
   private final String host;
