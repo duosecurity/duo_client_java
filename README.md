@@ -48,7 +48,7 @@ The Java API Client project is available from Duo Security on Maven.  Include th
 <dependency>
     <groupId>com.duosecurity</groupId>
     <artifactId>duo-client</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
