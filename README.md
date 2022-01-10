@@ -52,14 +52,14 @@ The Java API Client project is available from Duo Security on Maven.  Include th
 </dependency>
 ```
 
-See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.4.0 for more details.
+See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.5.0 for more details.
 
 # Using the Example
 There is an example in /duo-example-admin
 Create an Admin API application in your Duo Admin Panel. 
 To set the minimum permissions, under your API's 'Permissions', check the three boxes that start with "Grant read ...".
 ```
-$ java -jar duo-example-admin-0.4.0-jar-with-dependencies.jar -host <host> -ikey <ikey> -skey <skey>
+$ java -jar duo-example-admin-0.5.0-jar-with-dependencies.jar -host <host> -ikey <ikey> -skey <skey>
 ```
 If successful, the console will print the users and authentication attempts.
 
