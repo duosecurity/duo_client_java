@@ -9,6 +9,10 @@
 **duo_client** - Demonstration client to call Duo API methods
 with Java.
 
+## Tested Against Java Versions:
+* 8
+* 11
+
 # Duo Auth API
 
 The Duo Auth API provides a low-level API for adding strong two-factor
