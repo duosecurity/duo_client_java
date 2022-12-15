@@ -25,14 +25,12 @@ public class Http {
   public static final int DEFAULT_TIMEOUT_SECS = 60;
   private static final int RATE_LIMIT_ERROR_CODE = 429;
 
-  public static final String HmacSHA1 = "HmacSHA1";
-  public static final String HmacSHA512 = "HmacSHA512";
   public static final String UserAgentString = "Duo API Java/0.5.1-SNAPSHOT";
 
   private final String method;
   private final String host;
   private final String uri;
-  private String signingAlgorithm;
+  private final String signingAlgorithm = "HmacSHA512";
   private Headers.Builder headers;
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
@@ -86,7 +84,6 @@ public class Http {
     method = inMethod.toUpperCase();
     host = inHost;
     uri = inUri;
-    signingAlgorithm = "HmacSHA1";
 
     headers = new Headers.Builder();
     headers.add("Host", host);
@@ -257,21 +254,6 @@ public class Http {
   public void useCustomCertificates(String[] customCaCerts) {
     CertificatePinner pinner = Util.createPinner(host, customCaCerts);
     httpClient = httpClient.newBuilder().certificatePinner(pinner).build();
-  }
-
-  /**
-   * Set Signing Algorithm.
-   *
-   * @param algorithm   The algorith used for signing
-   *
-   * @throws NoSuchAlgorithmException For algorithms that are not HmacSHA1 or HmacSHA512
-   */
-  public void setSigningAlgorithm(String algorithm)
-      throws NoSuchAlgorithmException {
-    if (algorithm != HmacSHA1 && algorithm != HmacSHA512) {
-      throw new NoSuchAlgorithmException(algorithm);
-    }
-    signingAlgorithm = algorithm;
   }
 
   protected String canonRequest(String date, int sigVersion)
