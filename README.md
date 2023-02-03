@@ -13,6 +13,10 @@ with Java.
 * 8
 * 11
 
+## TLS 1.2 and 1.3 Support
+
+Duo_client_java uses the Java cryptography libraries for TLS operations.  Both TLS 1.2 and 1.3 are supported by Java 8 and later versions.  
+
 # Duo Auth API
 
 The Duo Auth API provides a low-level API for adding strong two-factor
