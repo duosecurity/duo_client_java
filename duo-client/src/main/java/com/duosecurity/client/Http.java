@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 
-import com.duosecurity.client.Canonicalization.*;
+import com.duosecurity.client.canonicalization.*;
 
 public class Http {
   public static final int BACKOFF_FACTOR = 2;
@@ -265,10 +265,10 @@ public class Http {
     String canon;
     String queryString = createQueryString();
     if (sigVersion == 1){
-      canonicalizer = new v1();
+      canonicalizer = new V1();
       canon = canonicalizer.canonicalize(method, host, uri, queryString);
     } else if (sigVersion == 2){
-      canonicalizer = new v2(date);
+      canonicalizer = new V2(date);
       canon = canonicalizer.canonicalize(method, host, uri, queryString);
     } else {
       throw new IllegalArgumentException("Invalid Request Signature");

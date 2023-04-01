@@ -1,7 +1,7 @@
-package com.duosecurity.client.Canonicalization;
+package com.duosecurity.client.canonicalization;
 
-public class v1 extends Canonicalizer {
-    
+public class V1 extends Canonicalizer {
+
     @Override
     public String canonicalize(String method, String host, String url, String queryString) {
         String canon = "";

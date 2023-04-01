@@ -1,13 +1,12 @@
-package com.duosecurity.client.Canonicalization;
+package com.duosecurity.client.canonicalization;
 
-
-public class v2 extends Canonicalizer {
+public class V2 extends Canonicalizer {
     private String date;
 
-    public v2(String inDate){
+    public V2(String inDate) {
         date = inDate;
     }
-    
+
     @Override
     public String canonicalize(String method, String host, String url, String queryString) {
         String canon = "";
