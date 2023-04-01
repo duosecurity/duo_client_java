@@ -57,6 +57,17 @@ public class HttpCanonRequestTest {
                                  + expected_prefix
                                  + expected_query_string),
                                 actual);
+
+            try {
+                h.canonRequest(date, 99);
+                Assert.fail("Expected exception was not thrown");
+            }
+            catch (IllegalArgumentException e){
+                Assert.assertEquals(new IllegalArgumentException("Invalid Request Signature").toString(), e.toString());
+            } catch (UnsupportedEncodingException e) {
+                Assert.fail(e.toString());
+                return;
+            }
         }
     }
 

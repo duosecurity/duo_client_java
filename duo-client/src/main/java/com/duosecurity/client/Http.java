@@ -18,6 +18,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 
+import com.duosecurity.client.Canonicalization.*;
+
 public class Http {
   public static final int BACKOFF_FACTOR = 2;
   public static final int INITIAL_BACKOFF_MS = 1000;
@@ -35,6 +37,7 @@ public class Http {
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
   private OkHttpClient httpClient;
+  private Canonicalizer canonicalizer;
 
   public static SimpleDateFormat RFC_2822_DATE_FORMAT
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
@@ -180,7 +183,7 @@ public class Http {
   }
 
   public void signRequest(String ikey, String skey)
-      throws UnsupportedEncodingException {
+      throws UnsupportedEncodingException, IllegalArgumentException {
     signRequest(ikey, skey, 2);
   }
 
@@ -192,9 +195,10 @@ public class Http {
    * @param sigVersion  The version of signature used
    *
    * @throws UnsupportedEncodingException For unsupported encodings
+   * @throws IllegalArgumentException For Illegal arguments
    */
   public void signRequest(String ikey, String skey, int sigVersion)
-      throws UnsupportedEncodingException {
+      throws UnsupportedEncodingException, IllegalArgumentException {
     String date = formatDate(new Date());
     String canon = canonRequest(date, sigVersion);
     String sig = signHMAC(skey, canon);
@@ -257,16 +261,18 @@ public class Http {
   }
 
   protected String canonRequest(String date, int sigVersion)
-      throws UnsupportedEncodingException {
-    String canon = "";
-    if (sigVersion == 2) {
-      canon += date + "\n";
+      throws UnsupportedEncodingException, IllegalArgumentException {
+    String canon;
+    String queryString = createQueryString();
+    if (sigVersion == 1){
+      canonicalizer = new v1();
+      canon = canonicalizer.canonicalize(method, host, uri, queryString);
+    } else if (sigVersion == 2){
+      canonicalizer = new v2(date);
+      canon = canonicalizer.canonicalize(method, host, uri, queryString);
+    } else {
+      throw new IllegalArgumentException("Invalid Request Signature");
     }
-    canon += method.toUpperCase() + "\n";
-    canon += host.toLowerCase() + "\n";
-    canon += uri + "\n";
-    canon += createQueryString();
-
     return canon;
   }
 
