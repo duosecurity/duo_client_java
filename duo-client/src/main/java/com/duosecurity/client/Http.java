@@ -269,16 +269,16 @@ public class Http {
 
     String canon = "";
     if (sigVersion == 1) {
-      canon += method.toUpperCase() + "\n";
-      canon += host.toLowerCase() + "\n";
-      canon += uri + "\n";
+      canon += method.toUpperCase() + System.lineSeparator();
+      canon += host.toLowerCase() + System.lineSeparator();
+      canon += uri + System.lineSeparator();
       canon += canonQueryString();
     }
     else if (sigVersion == 2) {
-      canon += date + "\n";
-      canon += method.toUpperCase() + "\n";
-      canon += host.toLowerCase() + "\n";
-      canon += uri + "\n";
+      canon += date + System.lineSeparator();
+      canon += method.toUpperCase() + System.lineSeparator();
+      canon += host.toLowerCase() + System.lineSeparator();
+      canon += uri + System.lineSeparator();
       canon += canonQueryString();
     }
 
