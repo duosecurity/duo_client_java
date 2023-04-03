@@ -65,7 +65,7 @@ public class HttpCanonRequestTest {
                 Assert.fail(e.toString());
                 return;
             }
-            Assert.assertEquals("failure - unsupport sig_version",
+            Assert.assertEquals("failure - unsupported sig_version use default sig_version 1",
                                 (expected_prefix + expected_query_string),
                                 actual);
         }
