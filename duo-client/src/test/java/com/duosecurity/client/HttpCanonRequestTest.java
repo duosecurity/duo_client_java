@@ -57,6 +57,17 @@ public class HttpCanonRequestTest {
                                  + expected_prefix
                                  + expected_query_string),
                                 actual);
+
+            try {
+                actual = h.canonRequest(date, 99);
+            }
+            catch (UnsupportedEncodingException e) {
+                Assert.fail(e.toString());
+                return;
+            }
+            Assert.assertEquals("failure - unsupported sig_version use default sig_version 1",
+                                (expected_prefix + expected_query_string),
+                                actual);
         }
     }
 

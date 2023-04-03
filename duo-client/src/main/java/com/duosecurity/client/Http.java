@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -131,7 +132,7 @@ public class Http {
    */
   public Response executeHttpRequest() throws Exception {
     String url = "https://" + host + uri;
-    String queryString = createQueryString();
+    String queryString = canonQueryString();
 
     Request.Builder builder = new Request.Builder();
     if (method.equals("POST")) {
@@ -256,21 +257,35 @@ public class Http {
     httpClient = httpClient.newBuilder().certificatePinner(pinner).build();
   }
 
-  protected String canonRequest(String date, int sigVersion)
+  protected String canonRequest(String date, int inSigVersion)
       throws UnsupportedEncodingException {
-    String canon = "";
-    if (sigVersion == 2) {
-      canon += date + "\n";
+
+    int[] availableSigVersion = {1, 2};
+    int sigVersion = 1;
+
+    if (Arrays.stream(availableSigVersion).anyMatch(i -> i == inSigVersion)){
+      sigVersion = inSigVersion;
     }
-    canon += method.toUpperCase() + "\n";
-    canon += host.toLowerCase() + "\n";
-    canon += uri + "\n";
-    canon += createQueryString();
+
+    String canon = "";
+    if (sigVersion == 1) {
+      canon += method.toUpperCase() + System.lineSeparator();
+      canon += host.toLowerCase() + System.lineSeparator();
+      canon += uri + System.lineSeparator();
+      canon += canonQueryString();
+    }
+    else if (sigVersion == 2) {
+      canon += date + System.lineSeparator();
+      canon += method.toUpperCase() + System.lineSeparator();
+      canon += host.toLowerCase() + System.lineSeparator();
+      canon += uri + System.lineSeparator();
+      canon += canonQueryString();
+    }
 
     return canon;
   }
 
-  private String createQueryString()
+  private String canonQueryString()
       throws UnsupportedEncodingException {
     ArrayList<String> args = new ArrayList<String>();
     ArrayList<String> keys = new ArrayList<String>();
