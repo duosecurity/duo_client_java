@@ -260,10 +260,10 @@ public class Http {
   protected String canonRequest(String date, int inSigVersion)
       throws UnsupportedEncodingException {
 
-    int[] avaiableSigVersion = {1, 2};
+    int[] availableSigVersion = {1, 2};
     int sigVersion = 1;
 
-    if (Arrays.stream(avaiableSigVersion).anyMatch(i -> i == inSigVersion)){
+    if (Arrays.stream(availableSigVersion).anyMatch(i -> i == inSigVersion)){
       sigVersion = inSigVersion;
     }
 
