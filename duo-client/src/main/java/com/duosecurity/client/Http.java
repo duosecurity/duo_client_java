@@ -17,6 +17,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.json.JSONObject;
 
 public class Http {
@@ -36,6 +38,7 @@ public class Http {
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
   private OkHttpClient httpClient;
+  private Map<String, String> additionalHeaders = new CaseInsensitiveMap<String, String>();
 
   public static SimpleDateFormat RFC_2822_DATE_FORMAT
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
@@ -236,6 +239,11 @@ public class Http {
     params.put(name, value);
   }
 
+  public void addAdditionalHeader(String name, String value) throws IllegalArgumentException{
+    validateAdditionalHeader(name, value);
+    additionalHeaders.put(name, value);
+  }
+
   /**
    * Creates a new proxy.
    *
@@ -311,6 +319,27 @@ public class Http {
     }
 
     return Util.join(args.toArray(), "&");
+  }
+
+  private String canonXDuoHeaders(){
+    ArrayList<String> canonList = new ArrayList<String>();
+    for (String name : additionalHeaders.keySet()){
+      String value = additionalHeaders.get(name);
+      canonList.add(name + value);
+    }
+    return Util.join(canonList.toArray(), String.valueOf(Character.MIN_VALUE));
+  }
+
+  private void validateAdditionalHeader(String name, String value) throws IllegalArgumentException{
+    if (name == null || name.length() == 0){
+      throw new IllegalArgumentException("Not allowed 'Null' or empty header name");
+    } else if (value == null || value.length() == 0){
+      throw new IllegalArgumentException("Not allowed 'Null' or empty header value");
+    } else if (!name.toLowerCase().startsWith("x-duo-")){
+      throw new IllegalArgumentException("Additional headers must start with \'X-Duo-\'");
+    } else if (additionalHeaders.containsKey(name)){
+      throw new IllegalArgumentException("Duplicate header passed, header=" + name);
+    }
   }
 
   /**
