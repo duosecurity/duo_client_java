@@ -36,6 +36,7 @@ public class Http {
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
   private OkHttpClient httpClient;
+  private int sigVersion = 2;
 
   public static SimpleDateFormat RFC_2822_DATE_FORMAT
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
@@ -133,28 +134,34 @@ public class Http {
   public Response executeHttpRequest() throws Exception {
     String url = "https://" + host + uri;
     String queryString = canonQueryString();
+    RequestBody requestBody;
+    if (sigVersion == 1 | sigVersion == 2){
+      requestBody = RequestBody.create(queryString, FORM_ENCODED);
+    } else {
+      throw new UnsupportedOperationException("Unsupported signature version: " + sigVersion);
+    }
 
-    Request.Builder builder = new Request.Builder();
+    Request.Builder requestBuilder = new Request.Builder();
     if (method.equals("POST")) {
-      builder.post(RequestBody.create(FORM_ENCODED, queryString));
+      requestBuilder.post(requestBody);
     } else if (method.equals("PUT")) {
-      builder.put(RequestBody.create(FORM_ENCODED, queryString));
+      requestBuilder.put(requestBody);
     } else if (method.equals("GET")) {
       if (queryString.length() > 0) {
         url += "?" + queryString;
       }
-      builder.get();
+      requestBuilder.get();
     } else if (method.equals("DELETE")) {
       if (queryString.length() > 0) {
         url += "?" + queryString;
       }
-      builder.delete();
+      requestBuilder.delete();
     } else {
       throw new UnsupportedOperationException("Unsupported method: " + method);
     }
 
     // finish and execute request
-    Request request = builder.headers(headers.build()).url(url).build();
+    Request request = requestBuilder.headers(headers.build()).url(url).build();
     return executeRequest(request);
   }
 
@@ -194,8 +201,14 @@ public class Http {
    *
    * @throws UnsupportedEncodingException For unsupported encodings
    */
-  public void signRequest(String ikey, String skey, int sigVersion)
+  public void signRequest(String ikey, String skey, int inSigVersion)
       throws UnsupportedEncodingException {
+    int[] availableSigVersion = {1, 2};
+
+    if (Arrays.stream(availableSigVersion).anyMatch(i -> i == inSigVersion)){
+      sigVersion = inSigVersion;
+    }
+
     String date = formatDate(new Date());
     String canon = canonRequest(date, sigVersion);
     String sig = signHMAC(skey, canon);
@@ -257,16 +270,8 @@ public class Http {
     httpClient = httpClient.newBuilder().certificatePinner(pinner).build();
   }
 
-  protected String canonRequest(String date, int inSigVersion)
+  protected String canonRequest(String date, int sigVersion)
       throws UnsupportedEncodingException {
-
-    int[] availableSigVersion = {1, 2};
-    int sigVersion = 1;
-
-    if (Arrays.stream(availableSigVersion).anyMatch(i -> i == inSigVersion)){
-      sigVersion = inSigVersion;
-    }
-
     String canon = "";
     if (sigVersion == 1) {
       canon += method.toUpperCase() + System.lineSeparator();
