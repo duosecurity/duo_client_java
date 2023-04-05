@@ -13,12 +13,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.json.JSONObject;
 
 public class Http {
@@ -38,7 +39,7 @@ public class Http {
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
   private OkHttpClient httpClient;
-  private Map<String, String> additionalHeaders = new CaseInsensitiveMap<String, String>();
+  private Map<String, String> additionalDuoHeaders = new TreeMap<String, String>();
 
   public static SimpleDateFormat RFC_2822_DATE_FORMAT
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
@@ -239,9 +240,8 @@ public class Http {
     params.put(name, value);
   }
 
-  public void addAdditionalHeader(String name, String value) throws IllegalArgumentException{
-    validateAdditionalHeader(name, value);
-    additionalHeaders.put(name, value);
+  public void addAdditionalDuoHeader(Map<String, String> inAdditionalDuoHeaders){
+    additionalDuoHeaders = inAdditionalDuoHeaders;
   }
 
   /**
@@ -322,25 +322,16 @@ public class Http {
   }
 
   private String canonXDuoHeaders(){
-    ArrayList<String> canonList = new ArrayList<String>();
-    for (String name : additionalHeaders.keySet()){
-      String value = additionalHeaders.get(name);
+    List<String> canonList = new ArrayList<>();
+    for (String name : additionalDuoHeaders.keySet()){
+      String value = additionalDuoHeaders.get(name);
       canonList.add(name + value);
+      headers.add(name, value);
     }
     return Util.join(canonList.toArray(), String.valueOf(Character.MIN_VALUE));
   }
 
-  private void validateAdditionalHeader(String name, String value) throws IllegalArgumentException{
-    if (name == null || name.length() == 0){
-      throw new IllegalArgumentException("Not allowed 'Null' or empty header name");
-    } else if (value == null || value.length() == 0){
-      throw new IllegalArgumentException("Not allowed 'Null' or empty header value");
-    } else if (!name.toLowerCase().startsWith("x-duo-")){
-      throw new IllegalArgumentException("Additional headers must start with \'X-Duo-\'");
-    } else if (additionalHeaders.containsKey(name)){
-      throw new IllegalArgumentException("Duplicate header passed, header=" + name);
-    }
-  }
+
 
   /**
    * Builder for an Http client object
@@ -352,6 +343,7 @@ public class Http {
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
     private String[] caCerts = null;
+    private Map<String, String> additionalDuoHeaders = new TreeMap<String, String>();
 
     /**
      * Builder entry point
@@ -391,6 +383,20 @@ public class Http {
     }
 
     /**
+     * Set additional header for the HTTP client
+     *
+     * @param name   Header's name
+     * @param value   Header's value
+     * @return the Builder
+     */
+    public HttpBuilder addAdditionalDuoHeader(String name, String value) throws IllegalArgumentException{
+      validateXDuoHeader(name, value);
+      this.additionalDuoHeaders.put(name.toLowerCase(), value);
+      return this;
+
+    }
+
+    /**
      * Build the HTTP client object based on the builder options
      *
      * @return the specified Http client object
@@ -400,8 +406,25 @@ public class Http {
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }
+      if (additionalDuoHeaders != null) {
+        duoClient.addAdditionalDuoHeader(additionalDuoHeaders);
+      }
 
       return duoClient;
+    }
+
+
+
+    private void validateXDuoHeader(String name, String value) throws IllegalArgumentException{
+      if (name == null || name.length() == 0){
+        throw new IllegalArgumentException("Not allowed 'Null' or empty header name");
+      } else if (value == null || value.length() == 0){
+        throw new IllegalArgumentException("Not allowed 'Null' or empty header value");
+      } else if (!name.toLowerCase().startsWith("x-duo-")){
+        throw new IllegalArgumentException("Additional headers must start with \'X-Duo-\'");
+      } else if (additionalDuoHeaders.containsKey(name)){
+        throw new IllegalArgumentException("Duplicate header passed, header=" + name);
+      }
     }
   }
 }

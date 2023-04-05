@@ -2,25 +2,28 @@ package com.duosecurity.client;
 
 
 import org.junit.Test;
+
+import com.duosecurity.client.Http.HttpBuilder;
+
 import org.junit.Assert;
 
 public class HttpAdditionalHeadersTest {
-    private static Http makeHttp() {
-        return new Http.HttpBuilder("GET", "example.test", "/foo/bar").build();
+    private static HttpBuilder makeHttpBuilder() {
+        return new Http.HttpBuilder("GET", "example.test", "/foo/bar");
     }
 
     @Test
     public void testAddHeaders(){
-        Http h = makeHttp();
-        h.addAdditionalHeader("X-Duo-Header-1", "header_value_1");
-        h.addAdditionalHeader("X-Duo-Header-2", "header_value_2");
+        HttpBuilder h = makeHttpBuilder();
+        h.addAdditionalDuoHeader("X-Duo-Header-1", "header_value_1");
+        h.addAdditionalDuoHeader("X-Duo-Header-2", "header_value_2");
     }
 
     @Test
     public void testNullHeaderName(){
-        Http h = makeHttp();
+        HttpBuilder h = makeHttpBuilder();
         try {
-            h.addAdditionalHeader(null, "header_value_1");
+            h.addAdditionalDuoHeader(null, "header_value_1");
         }
         catch (IllegalArgumentException e){
             Assert.assertEquals(
@@ -32,9 +35,9 @@ public class HttpAdditionalHeadersTest {
     }
     @Test
     public void testEmptyHeaderName(){
-        Http h = makeHttp();
+        HttpBuilder h = makeHttpBuilder();
         try {
-            h.addAdditionalHeader("", "header_value_1");
+            h.addAdditionalDuoHeader("", "header_value_1");
         }
         catch (IllegalArgumentException e){
             Assert.assertEquals(
@@ -47,9 +50,9 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testNullHeaderValue(){
-        Http h = makeHttp();
+        HttpBuilder h = makeHttpBuilder();
         try {
-            h.addAdditionalHeader("X-Duo-Header-1", null);
+            h.addAdditionalDuoHeader("X-Duo-Header-1", null);
         }
         catch (IllegalArgumentException e){
             Assert.assertEquals(
@@ -62,9 +65,9 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testEmptyHeaderValue(){
-        Http h = makeHttp();
+        HttpBuilder h = makeHttpBuilder();
         try {
-            h.addAdditionalHeader("X-Duo-Header-1", "");
+            h.addAdditionalDuoHeader("X-Duo-Header-1", "");
         }
         catch (IllegalArgumentException e){
             Assert.assertEquals(
@@ -77,9 +80,9 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testNonDuoHeader(){
-        Http h = makeHttp();
+        HttpBuilder h = makeHttpBuilder();
         try {
-            h.addAdditionalHeader("X-not-Duo-Header-1", "header_value_1");
+            h.addAdditionalDuoHeader("X-not-Duo-Header-1", "header_value_1");
         }
         catch (IllegalArgumentException e){
             Assert.assertEquals(
@@ -92,10 +95,10 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testDuplicatedHeader(){
-        Http h = makeHttp();
-        h.addAdditionalHeader("X-Duo-Header-1", "header_value_1");
+        HttpBuilder h = makeHttpBuilder();
+        h.addAdditionalDuoHeader("X-Duo-Header-1", "header_value_1");
         try {
-            h.addAdditionalHeader("X-DUO-Header-1", "header_value_1");
+            h.addAdditionalDuoHeader("X-DUO-Header-1", "header_value_1");
         }
         catch (IllegalArgumentException e){
             Assert.assertEquals(
@@ -105,7 +108,4 @@ public class HttpAdditionalHeadersTest {
         }
         
     }
-
-
-
 }
