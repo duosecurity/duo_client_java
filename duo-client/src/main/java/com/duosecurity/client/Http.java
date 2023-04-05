@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ public class Http {
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
   private OkHttpClient httpClient;
-  private Map<String, String> additionalDuoHeaders = new TreeMap<String, String>();
+  private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
 
   public static SimpleDateFormat RFC_2822_DATE_FORMAT
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
@@ -241,7 +242,7 @@ public class Http {
   }
 
   public void addAdditionalDuoHeader(Map<String, String> inAdditionalDuoHeaders){
-    additionalDuoHeaders = inAdditionalDuoHeaders;
+    additionalDuoHeaders.putAll(inAdditionalDuoHeaders);
   }
 
   /**
@@ -343,7 +344,8 @@ public class Http {
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
     private String[] caCerts = null;
-    private Map<String, String> additionalDuoHeaders = new TreeMap<String, String>();
+    private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
+    private Map<String, String> headers = new HashMap<String,String>();
 
     /**
      * Builder entry point
@@ -383,7 +385,7 @@ public class Http {
     }
 
     /**
-     * Set additional header for the HTTP client
+     * Set additional x-duo header for the HTTP client
      *
      * @param name   Header's name
      * @param value   Header's value
@@ -394,6 +396,18 @@ public class Http {
       this.additionalDuoHeaders.put(name.toLowerCase(), value);
       return this;
 
+    }
+
+    /**
+     * Add header for the HTTP client
+     *
+     * @param name   Header's name
+     * @param value   Header's value
+     * @return the Builder
+     */
+    public HttpBuilder addHeader(String name, String value){
+      this.headers.put(name, value);
+      return this;
     }
 
     /**
@@ -408,6 +422,12 @@ public class Http {
       }
       if (additionalDuoHeaders != null) {
         duoClient.addAdditionalDuoHeader(additionalDuoHeaders);
+      }
+      if (headers != null){
+        for (String name : headers.keySet()){
+          String value = headers.get(name);
+          duoClient.addHeader(name, value);
+        }
       }
 
       return duoClient;
