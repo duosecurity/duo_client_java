@@ -135,11 +135,12 @@ public class Http {
   public Response executeHttpRequest() throws Exception {
     String url = "https://" + host + uri;
     String queryString = canonQueryString();
+    String jsonString = canonJson();
     RequestBody requestBody;
     if (sigVersion == 1 | sigVersion == 2){
       requestBody = RequestBody.create(queryString, FORM_ENCODED);
     } else if (sigVersion == 5){
-      requestBody = RequestBody.create(queryString, JSON_ENCODED);
+      requestBody = RequestBody.create(jsonString, JSON_ENCODED);
     } else {
       throw new UnsupportedOperationException("Unsupported signature version: " + sigVersion);
     }
@@ -319,6 +320,11 @@ public class Http {
     }
 
     return Util.join(args.toArray(), "&");
+  }
+
+  private String canonJson(){
+    JSONObject jsonBody = new JSONObject(params);
+    return  jsonBody.toString();
   }
 
   /**
