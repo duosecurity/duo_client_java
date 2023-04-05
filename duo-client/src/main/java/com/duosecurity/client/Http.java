@@ -13,10 +13,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
 import org.json.JSONObject;
 
 public class Http {
@@ -36,6 +40,7 @@ public class Http {
   Map<String, String> params = new HashMap<String, String>();
   private Random random = new Random();
   private OkHttpClient httpClient;
+  private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
 
   public static SimpleDateFormat RFC_2822_DATE_FORMAT
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
@@ -236,6 +241,10 @@ public class Http {
     params.put(name, value);
   }
 
+  public void addAdditionalDuoHeader(Map<String, String> inAdditionalDuoHeaders){
+    additionalDuoHeaders.putAll(inAdditionalDuoHeaders);
+  }
+
   /**
    * Creates a new proxy.
    *
@@ -313,6 +322,18 @@ public class Http {
     return Util.join(args.toArray(), "&");
   }
 
+  private String canonXDuoHeaders(){
+    List<String> canonList = new ArrayList<>();
+    for (String name : additionalDuoHeaders.keySet()){
+      String value = additionalDuoHeaders.get(name);
+      canonList.add(name + value);
+      headers.add(name, value);
+    }
+    return Util.join(canonList.toArray(), String.valueOf(Character.MIN_VALUE));
+  }
+
+
+
   /**
    * Builder for an Http client object
    */
@@ -323,6 +344,8 @@ public class Http {
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
     private String[] caCerts = null;
+    private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
+    private Map<String, String> headers = new HashMap<String,String>();
 
     /**
      * Builder entry point
@@ -362,6 +385,32 @@ public class Http {
     }
 
     /**
+     * Set additional x-duo header for the HTTP client
+     *
+     * @param name   Header's name
+     * @param value   Header's value
+     * @return the Builder
+     */
+    public HttpBuilder addAdditionalDuoHeader(String name, String value) throws IllegalArgumentException{
+      validateXDuoHeader(name, value);
+      this.additionalDuoHeaders.put(name.toLowerCase(), value);
+      return this;
+
+    }
+
+    /**
+     * Add header for the HTTP client
+     *
+     * @param name   Header's name
+     * @param value   Header's value
+     * @return the Builder
+     */
+    public HttpBuilder addHeader(String name, String value){
+      this.headers.put(name, value);
+      return this;
+    }
+
+    /**
      * Build the HTTP client object based on the builder options
      *
      * @return the specified Http client object
@@ -371,8 +420,31 @@ public class Http {
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }
+      if (additionalDuoHeaders != null) {
+        duoClient.addAdditionalDuoHeader(additionalDuoHeaders);
+      }
+      if (headers != null){
+        for (String name : headers.keySet()){
+          String value = headers.get(name);
+          duoClient.addHeader(name, value);
+        }
+      }
 
       return duoClient;
+    }
+
+
+
+    private void validateXDuoHeader(String name, String value) throws IllegalArgumentException{
+      if (name == null || name.length() == 0){
+        throw new IllegalArgumentException("Not allowed 'Null' or empty header name");
+      } else if (value == null || value.length() == 0){
+        throw new IllegalArgumentException("Not allowed 'Null' or empty header value");
+      } else if (!name.toLowerCase().startsWith("x-duo-")){
+        throw new IllegalArgumentException("Additional headers must start with \'X-Duo-\'");
+      } else if (additionalDuoHeaders.containsKey(name)){
+        throw new IllegalArgumentException("Duplicate header passed, header=" + name);
+      }
     }
   }
 }
