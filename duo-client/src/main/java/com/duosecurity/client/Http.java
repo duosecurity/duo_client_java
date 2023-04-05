@@ -42,6 +42,7 @@ public class Http {
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
 
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
+  public static MediaType JSON_ENCODED = MediaType.parse("application/json; charset=utf-8");
 
   private static final String[] DEFAULT_CA_CERTS = {
       //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Assured ID Root CA
@@ -137,6 +138,8 @@ public class Http {
     RequestBody requestBody;
     if (sigVersion == 1 | sigVersion == 2){
       requestBody = RequestBody.create(queryString, FORM_ENCODED);
+    } else if (sigVersion == 5){
+      requestBody = RequestBody.create(queryString, JSON_ENCODED);
     } else {
       throw new UnsupportedOperationException("Unsupported signature version: " + sigVersion);
     }
