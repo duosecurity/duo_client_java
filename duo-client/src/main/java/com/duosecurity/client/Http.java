@@ -142,13 +142,13 @@ public class Http {
     String queryString = canonQueryString();
     String jsonBody = canonJSONBody();
     RequestBody requestBody;
-    if (sigVersion == 1 | sigVersion == 2){
+    if (sigVersion == 1 || sigVersion == 2){
       requestBody = RequestBody.create(queryString, FORM_ENCODED);
     } else if (sigVersion == 5){
-      if (method == "POST" | method == "PUT"){
+      if (method == "POST" || method == "PUT"){
         requestBody = RequestBody.create(jsonBody, JSON_ENCODED);
       } else {
-        requestBody = RequestBody.create(queryString, FORM_ENCODED);
+        requestBody = null;
       }
     } else {
       throw new UnsupportedOperationException("Unsupported signature version: " + sigVersion);
