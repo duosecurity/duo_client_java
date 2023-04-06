@@ -340,7 +340,7 @@ public class Http {
   }
 
   private String canonJSONString(){
-    ArrayList<String> jsonBody = new ArrayList<String>();
+    ArrayList<String> jsonBody = new ArrayList<>();
 
     for (String key: params.keySet()){
       String name = key;
