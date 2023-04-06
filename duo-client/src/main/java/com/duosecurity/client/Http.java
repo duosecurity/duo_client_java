@@ -47,6 +47,7 @@ public class Http {
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
 
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
+  public static MediaType JSON_ENCODED = MediaType.parse("application/json; charset=utf-8");
 
   private static final String[] DEFAULT_CA_CERTS = {
       //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Assured ID Root CA
@@ -139,9 +140,16 @@ public class Http {
   public Response executeHttpRequest() throws Exception {
     String url = "https://" + host + uri;
     String queryString = canonQueryString();
+    String jsonBody = canonJSONBody();
     RequestBody requestBody;
     if (sigVersion == 1 | sigVersion == 2){
       requestBody = RequestBody.create(queryString, FORM_ENCODED);
+    } else if (sigVersion == 5){
+      if (method == "POST" | method == "PUT"){
+        requestBody = RequestBody.create(jsonBody, JSON_ENCODED);
+      } else {
+        requestBody = RequestBody.create(queryString, FORM_ENCODED);
+      }
     } else {
       throw new UnsupportedOperationException("Unsupported signature version: " + sigVersion);
     }
@@ -324,6 +332,23 @@ public class Http {
     }
 
     return Util.join(args.toArray(), "&");
+  }
+
+  private String canonJSONBody(){
+    JSONObject jsonBody = new JSONObject(params);
+    return jsonBody.toString();
+  }
+
+  private String canonJSONString(){
+    ArrayList<String> jsonBody = new ArrayList<String>();
+
+    for (String key: params.keySet()){
+      String name = key;
+      String value = params.get(key);
+      jsonBody.add(name + ":" + value);
+    }
+
+    return Util.join(jsonBody.toArray(), ",");
   }
 
   private String canonXDuoHeaders(){
