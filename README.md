@@ -12,6 +12,7 @@ with Java.
 ## Tested Against Java Versions:
 * 8
 * 11
+* 17
 
 ## TLS 1.2 and 1.3 Support
 
