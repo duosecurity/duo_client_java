@@ -22,8 +22,6 @@ import static org.junit.Assert.assertEquals;
 public class HttpRateLimitRetryTest {
     @Mock
     private OkHttpClient httpClient;
-    @Mock
-    private Random random;
 
     private Http http;
 
@@ -34,15 +32,11 @@ public class HttpRateLimitRetryTest {
         http = new Http.HttpBuilder("GET", "example.test", "/foo/bar").build();
         http = Mockito.spy(http);
 
-        Field randomField = Http.class.getDeclaredField("random");
-        randomField.setAccessible(true);
-        randomField.set(http, random);
-
         Field httpClientField = Http.class.getDeclaredField("httpClient");
         httpClientField.setAccessible(true);
         httpClientField.set(http, httpClient);
 
-        Mockito.when(random.nextInt(1000)).thenReturn(RANDOM_INT);
+        Mockito.when(http.nextRandomInt(1000)).thenReturn(RANDOM_INT);
         Mockito.doNothing().when(http).sleep(Mockito.any(Long.class));
     }
 

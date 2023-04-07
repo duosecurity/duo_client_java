@@ -183,7 +183,7 @@ public class Http {
         return response;
       }
 
-      sleep(backoffMs + random.nextInt(1000));
+      sleep(backoffMs + nextRandomInt(1000));
       backoffMs *= BACKOFF_FACTOR;
     }
   }
@@ -334,6 +334,10 @@ public class Http {
       headers.add(name, value);
     }
     return Util.join(canonList.toArray(), String.valueOf(Character.MIN_VALUE));
+  }
+
+  public int nextRandomInt(int bound){
+    return random.nextInt(bound);
   }
 
 
