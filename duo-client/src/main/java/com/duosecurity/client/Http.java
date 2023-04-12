@@ -216,7 +216,7 @@ public class Http {
    */
   public void signRequest(String ikey, String skey, int inSigVersion)
       throws UnsupportedEncodingException {
-    int[] availableSigVersion = {1, 2};
+    int[] availableSigVersion = {1, 2, 5};
 
     if (Arrays.stream(availableSigVersion).anyMatch(i -> i == inSigVersion)){
       sigVersion = inSigVersion;
@@ -228,7 +228,7 @@ public class Http {
     String auth = ikey + ":" + sig;
     String header = "Basic " + Base64.encodeBytes(auth.getBytes());
     addHeader("Authorization", header);
-    if (sigVersion == 2) {
+    if (sigVersion == 2 || sigVersion == 5) {
       addHeader("Date", date);
     }
   }
