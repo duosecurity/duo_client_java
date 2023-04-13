@@ -2,7 +2,9 @@ package com.duosecurity.client;
 
 import okhttp3.CertificatePinner;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -85,5 +87,23 @@ public class Util {
                                                     .build();
 
     return pinner;
+  }
+
+  /**
+   * Create hash byte array of message
+   *
+   * @param algorithm   The algorithm used to create the hash
+   * @param message     The text to create the hash
+   * @return a byte array
+   */
+  public static byte[] hash(String algorithm, String message) {
+      MessageDigest digest;
+      try {
+        digest = MessageDigest.getInstance(algorithm);
+        byte[] encodedhash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
+        return encodedhash;
+      } catch (NoSuchAlgorithmException e) {
+        return new byte[0];
+      }
   }
 }

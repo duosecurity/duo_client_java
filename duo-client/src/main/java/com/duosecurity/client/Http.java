@@ -6,11 +6,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URLEncoder;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +34,9 @@ public class Http {
   private final String host;
   private final String uri;
   private final String signingAlgorithm = "HmacSHA512";
+  private final String hashingAlgorithm = "SHA-512";
   private Headers.Builder headers;
-  Map<String, String> params = new HashMap<String, String>();
+  private SortedMap<String, Object> params = new TreeMap<String, Object>();
   private int sigVersion = 2;
   private Random random = new Random();
   private OkHttpClient httpClient;
@@ -47,7 +46,7 @@ public class Http {
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
 
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
-  public static MediaType JSON_ENCODED = MediaType.parse("application/json; charset=utf-8");
+  public static MediaType JSON_ENCODED = MediaType.parse("application/json");
 
   private static final String[] DEFAULT_CA_CERTS = {
       //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Assured ID Root CA
@@ -145,7 +144,7 @@ public class Http {
     if (sigVersion == 1 || sigVersion == 2){
       requestBody = RequestBody.create(queryString, FORM_ENCODED);
     } else if (sigVersion == 5){
-      if (method == "POST" || method == "PUT"){
+      if ("POST".equals(method) || "PUT".equals(method)){
         requestBody = RequestBody.create(jsonBody, JSON_ENCODED);
       } else {
         requestBody = null;
@@ -261,6 +260,19 @@ public class Http {
     params.put(name, value);
   }
 
+  public void addParam(String name, Integer value) {
+    params.put(name, value);
+  }
+
+  public void addParam(String name, JSONObject value) {
+    params.put(name, value);
+  }
+
+  public void addParam(String name, List<Object> value) {
+    params.put(name, value);
+  }
+
+
   public void addAdditionalDuoHeader(Map<String, String> inAdditionalDuoHeaders){
     additionalDuoHeaders.putAll(inAdditionalDuoHeaders);
   }
@@ -289,6 +301,8 @@ public class Http {
   protected String canonRequest(String date, int sigVersion)
       throws UnsupportedEncodingException {
     String canon = "";
+    String canonParam;
+    String canonBody;
     if (sigVersion == 1) {
       canon += method.toUpperCase() + System.lineSeparator();
       canon += host.toLowerCase() + System.lineSeparator();
@@ -301,6 +315,21 @@ public class Http {
       canon += host.toLowerCase() + System.lineSeparator();
       canon += uri + System.lineSeparator();
       canon += canonQueryString();
+    } else if (sigVersion == 5){
+      canon += date + System.lineSeparator();
+      canon += method.toUpperCase() + System.lineSeparator();
+      canon += host.toLowerCase() + System.lineSeparator();
+      canon += uri + System.lineSeparator();
+      if ("POST".equals(method) || "PUT".equals(method)){
+        canonParam = System.lineSeparator();
+        canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonJSONBody()));
+      } else {
+        canonParam = canonQueryString() + System.lineSeparator();
+        canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, ""));
+      }
+      canon += canonParam;
+      canon += canonBody + System.lineSeparator();
+      canon += Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonXDuoHeaders()));
     }
 
     return canon;
@@ -309,22 +338,15 @@ public class Http {
   private String canonQueryString()
       throws UnsupportedEncodingException {
     ArrayList<String> args = new ArrayList<String>();
-    ArrayList<String> keys = new ArrayList<String>();
 
     for (String key : params.keySet()) {
-      keys.add(key);
-    }
-
-    Collections.sort(keys);
-
-    for (String key : keys) {
       String name = URLEncoder
           .encode(key, "UTF-8")
           .replace("+", "%20")
           .replace("*", "%2A")
           .replace("%7E", "~");
       String value = URLEncoder
-          .encode(params.get(key), "UTF-8")
+          .encode(params.get(key).toString(), "UTF-8")
           .replace("+", "%20")
           .replace("*", "%2A")
           .replace("%7E", "~");
@@ -339,23 +361,11 @@ public class Http {
     return jsonBody.toString();
   }
 
-  private String canonJSONString(){
-    List<String> jsonBody = new ArrayList<>();
-
-    for (String key: params.keySet()){
-      String name = key;
-      String value = params.get(key);
-      jsonBody.add(name + ":" + value);
-    }
-
-    return Util.join(jsonBody.toArray(), ",");
-  }
-
   private String canonXDuoHeaders(){
     List<String> canonList = new ArrayList<>();
     for (String name : additionalDuoHeaders.keySet()){
       String value = additionalDuoHeaders.get(name);
-      canonList.add(name + value);
+      canonList.add(name + Character.MIN_VALUE + value);
       headers.add(name, value);
     }
     return Util.join(canonList.toArray(), String.valueOf(Character.MIN_VALUE));
