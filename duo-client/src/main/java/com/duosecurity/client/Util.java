@@ -103,7 +103,6 @@ public class Util {
         byte[] encodedhash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
         return encodedhash;
       } catch (NoSuchAlgorithmException e) {
-        e.printStackTrace();
         return new byte[0];
       }
   }

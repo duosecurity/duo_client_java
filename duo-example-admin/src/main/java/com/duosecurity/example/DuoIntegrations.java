@@ -149,7 +149,7 @@ public class DuoIntegrations {
             System.out.println("Creating new SSO integration");
             result = (JSONObject) request.executeJSONRequest();
             response = result.getJSONObject("response");
-            System.out.println("Created integration:")
+            System.out.println("Created integration:");
             System.out.println(response);
 
         } catch (Exception e) {

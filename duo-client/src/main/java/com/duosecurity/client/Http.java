@@ -268,7 +268,7 @@ public class Http {
     params.put(name, value);
   }
 
-  public void addParam(String name, ArrayList<Object> value) {
+  public void addParam(String name, List<Object> value) {
     params.put(name, value);
   }
 
