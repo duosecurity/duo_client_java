@@ -36,7 +36,7 @@ public class Http {
   private final String signingAlgorithm = "HmacSHA512";
   private final String hashingAlgorithm = "SHA-512";
   private Headers.Builder headers;
-  private Map<String, String> params = new TreeMap<String, String>();
+  private SortedMap<String, Object> params = new TreeMap<String, Object>();
   private int sigVersion = 2;
   private Random random = new Random();
   private OkHttpClient httpClient;
@@ -144,7 +144,7 @@ public class Http {
     if (sigVersion == 1 || sigVersion == 2){
       requestBody = RequestBody.create(queryString, FORM_ENCODED);
     } else if (sigVersion == 5){
-      if (method.equals("POST") || method.equals("PUT")){
+      if ("POST".equals(method) || "PUT".equals(method)){
         requestBody = RequestBody.create(jsonBody, JSON_ENCODED);
       } else {
         requestBody = null;
@@ -260,6 +260,19 @@ public class Http {
     params.put(name, value);
   }
 
+  public void addParam(String name, Integer value) {
+    params.put(name, value);
+  }
+
+  public void addParam(String name, JSONObject value) {
+    params.put(name, value);
+  }
+
+  public void addParam(String name, ArrayList<Object> value) {
+    params.put(name, value);
+  }
+
+
   public void addAdditionalDuoHeader(Map<String, String> inAdditionalDuoHeaders){
     additionalDuoHeaders.putAll(inAdditionalDuoHeaders);
   }
@@ -307,9 +320,9 @@ public class Http {
       canon += method.toUpperCase() + System.lineSeparator();
       canon += host.toLowerCase() + System.lineSeparator();
       canon += uri + System.lineSeparator();
-      if (method.equals("POST") || method.equals("PUT")){
+      if ("POST".equals(method) || "PUT".equals(method)){
         canonParam = System.lineSeparator();
-        canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonJSONString()));
+        canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonJSONBody()));
       } else {
         canonParam = canonQueryString() + System.lineSeparator();
         canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, ""));
@@ -335,7 +348,7 @@ public class Http {
           .replace("*", "%2A")
           .replace("%7E", "~");
       String value = URLEncoder
-          .encode(params.get(key), "UTF-8")
+          .encode(params.get(key).toString(), "UTF-8")
           .replace("+", "%20")
           .replace("*", "%2A")
           .replace("%7E", "~");
@@ -348,18 +361,6 @@ public class Http {
   private String canonJSONBody(){
     JSONObject jsonBody = new JSONObject(params);
     return jsonBody.toString();
-  }
-
-  private String canonJSONString(){
-    List<String> jsonBody = new ArrayList<>();
-
-    for (String key: params.keySet()){
-      String name = key;
-      String value = params.get(key);
-      jsonBody.add(name + ":" + value);
-    }
-
-    return Util.join(jsonBody.toArray(), ",");
   }
 
   private String canonXDuoHeaders(){

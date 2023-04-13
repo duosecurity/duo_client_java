@@ -97,12 +97,14 @@ public class Util {
    * @return a byte array
    */
   public static byte[] hash(String algorithm, String message) {
-    try{
-      MessageDigest digest = MessageDigest.getInstance(algorithm);
-      byte[] encodedhash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
-      return encodedhash;
-    }catch(Exception e){
-      return new byte[0];
-    }
+      MessageDigest digest;
+      try {
+        digest = MessageDigest.getInstance(algorithm);
+        byte[] encodedhash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
+        return encodedhash;
+      } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+        return new byte[0];
+      }
   }
 }
