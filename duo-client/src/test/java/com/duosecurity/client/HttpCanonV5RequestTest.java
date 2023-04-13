@@ -13,6 +13,7 @@ public class HttpCanonV5RequestTest {
     private String date = "Fri, 07 Dec 2012 17:18:00 -0000";
     private final String hashingAlgorithm = "SHA-512";
     String hashedBody;
+    String hasedEmptyAdditionalHeader = getHashedMessage("");
 
     private static HttpBuilder postHttpBuilder() {
         // deliberately use the "wrong" case for method and host,
@@ -28,21 +29,22 @@ public class HttpCanonV5RequestTest {
         return new Http.HttpBuilder("gEt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
     }
 
-    private String getHashedBody(String body) {
-        return Util.bytes_to_hex(Util.hash(hashingAlgorithm, body));
+    private String getHashedMessage(String message) {
+        return Util.bytes_to_hex(Util.hash(hashingAlgorithm, message));
     }
 
     @Test
     public void testPostZeroParams() {
         String actual;
-        hashedBody = getHashedBody("{}");
+        hashedBody = getHashedMessage("{}");
 
         String expected = date + "\n"
                 + "POST\n"
                 + "foo.bar52.com\n"
                 + "/Foo/BaR2/qux\n"
                 + "\n"
-                + hashedBody;
+                + hashedBody + "\n"
+                + hasedEmptyAdditionalHeader;
 
         Http h = postHttpBuilder().build();
         try {
@@ -60,13 +62,14 @@ public class HttpCanonV5RequestTest {
     public void testPostWithParams() throws JSONException {
         String actual;
         String jsonBody = "{\"data\":\"abc123\",\"alpha\":[\"a\",\"b\",\"c\",\"d\"],\"info\":{\"test\":1,\"anther\":2}}";
-        hashedBody = getHashedBody(jsonBody);
+        hashedBody = getHashedMessage(jsonBody);
         String expected = date + "\n"
                 + "POST\n"
                 + "foo.bar52.com\n"
                 + "/Foo/BaR2/qux\n"
                 + "\n"
-                + hashedBody;
+                + hashedBody + "\n"
+                + hasedEmptyAdditionalHeader;
 
         Http h = postHttpBuilder().build();
         h.addParam("data", "abc123");
@@ -99,13 +102,14 @@ public class HttpCanonV5RequestTest {
     @Test
     public void testGetZeroParams() {
         String actual;
-        hashedBody = getHashedBody("");
+        hashedBody = getHashedMessage("");
         String expected = date + "\n"
                 + "GET\n"
                 + "foo.bar52.com\n"
                 + "/Foo/BaR2/qux\n"
                 + "\n"
-                + hashedBody;
+                + hashedBody + "\n"
+                + hasedEmptyAdditionalHeader;
 
         Http h = getHttpBuilder().build();
         try {
@@ -122,13 +126,14 @@ public class HttpCanonV5RequestTest {
     @Test
     public void testGetWithParams() {
         String actual;
-        hashedBody = getHashedBody("");
+        hashedBody = getHashedMessage("");
         String expected = date + "\n"
                 + "GET\n"
                 + "foo.bar52.com\n"
                 + "/Foo/BaR2/qux\n"
                 + "data=abc123\n"
-                + hashedBody;
+                + hashedBody + "\n"
+                + hasedEmptyAdditionalHeader;
 
         Http h = getHttpBuilder().build();
         h.addParam("data", "abc123");
@@ -146,7 +151,7 @@ public class HttpCanonV5RequestTest {
     @Test
     public void testDuoHeaders() {
         String actual;
-        hashedBody = getHashedBody("{}");
+        hashedBody = getHashedMessage("{}");
         String expected = date + "\n"
                 + "POST\n"
                 + "foo.bar52.com\n"

@@ -46,7 +46,7 @@ public class Http {
       = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z", Locale.US);
 
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
-  public static MediaType JSON_ENCODED = MediaType.parse("application/json; charset=utf-8");
+  public static MediaType JSON_ENCODED = MediaType.parse("application/json");
 
   private static final String[] DEFAULT_CA_CERTS = {
       //C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Assured ID Root CA
@@ -328,10 +328,8 @@ public class Http {
         canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, ""));
       }
       canon += canonParam;
-      canon += canonBody;
-      if (additionalDuoHeaders != null && !additionalDuoHeaders.isEmpty()){
-        canon += System.lineSeparator() + Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonXDuoHeaders()));
-      }
+      canon += canonBody + System.lineSeparator();
+      canon += Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonXDuoHeaders()));
     }
 
     return canon;
