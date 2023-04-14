@@ -6,7 +6,7 @@ package com.duosecurity.example;
  * Documentation: http://www.duosecurity.com/docs/adminapi
  */
 
-import com.duosecurity.client.Http;
+import com.duosecurity.client.Admin;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,9 +88,9 @@ public class DuoAdmin {
     JSONObject result = null;
     try {
       // Prepare request.
-      Http request = new Http.HttpBuilder("GET",
-                              cmd.getOptionValue("host"),
-                              "/admin/v1/info/authentication_attempts").build();
+      Admin request = new Admin.AdminBuilder("GET",
+                                cmd.getOptionValue("host"),
+                                "/admin/v1/info/authentication_attempts").build();
       request.signRequest(cmd.getOptionValue("ikey"),
                           cmd.getOptionValue("skey"));
 
@@ -123,7 +123,7 @@ public class DuoAdmin {
     JSONObject metadata;
     try {
       // Prepare request.
-      Http request = new Http.HttpBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
+      Admin request = new Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
       String limit = "10";
       request.addParam("offset", "0");
       request.addParam("limit", limit);
@@ -147,7 +147,7 @@ public class DuoAdmin {
         if (!metadata.isNull("next_offset")) {
           offset = metadata.getInt("next_offset");
 
-          request = new Http.HttpBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
+          request = new Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
           request.addParam("offset", Integer.toString(offset));
           request.addParam("limit", limit);
           request.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));

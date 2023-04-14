@@ -37,7 +37,7 @@ public class Http {
   private final String hashingAlgorithm = "SHA-512";
   private Headers.Builder headers;
   private SortedMap<String, Object> params = new TreeMap<String, Object>();
-  private int sigVersion = 2;
+  protected int sigVersion = 2;
   private Random random = new Random();
   private OkHttpClient httpClient;
   private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
@@ -72,22 +72,14 @@ public class Http {
   };
 
   /**
-   * @deprecated Use the HttpBuilder instead
-   */
-  public Http(String inMethod, String inHost, String inUri) {
-    this(inMethod, inHost, inUri, DEFAULT_TIMEOUT_SECS);
-  }
-
-  /**
    * Http constructor.
    *
-   * @deprecated Use the HttpBuilder instead
    * @param inMethod    The method for the http request
    * @param inHost      The api host provided by Duo and found in the Duo admin panel
    * @param inUri       The endpoint for the request
    * @param timeout     The timeout for the http request
    */
-  public Http(String inMethod, String inHost, String inUri, int timeout) {
+  protected Http(String inMethod, String inHost, String inUri, int timeout) {
     method = inMethod.toUpperCase();
     host = inHost;
     uri = inUri;
@@ -201,7 +193,7 @@ public class Http {
 
   public void signRequest(String ikey, String skey)
       throws UnsupportedEncodingException {
-    signRequest(ikey, skey, 2);
+    signRequest(ikey, skey, sigVersion);
   }
 
   /**
@@ -380,7 +372,7 @@ public class Http {
   /**
    * Builder for an Http client object
    */
-  public static class HttpBuilder {
+  protected static abstract class HttpBuilder<T extends Http> {
     private final String method;
     private final String host;
     private final String uri;
@@ -397,7 +389,7 @@ public class Http {
      * @param host: the Duo host
      * @param uri: the API endpoint for the request
      */
-    public HttpBuilder(String method, String host, String uri) {
+    protected HttpBuilder(String method, String host, String uri) {
       this.method = method;
       this.host = host;
       this.uri = uri;
@@ -409,7 +401,7 @@ public class Http {
      * @param timeout: the timeout to use
      * @return the Builder
      */
-    public HttpBuilder useTimeout(int timeout) {
+    public HttpBuilder<T> useTimeout(int timeout) {
       this.timeout = timeout;
 
       return this;
@@ -421,7 +413,7 @@ public class Http {
      * @param customCaCerts   The CA certificates to pin to
      * @return the Builder
      */
-    public HttpBuilder useCustomCertificates(String[] customCaCerts) {
+    public HttpBuilder<T> useCustomCertificates(String[] customCaCerts) {
       this.caCerts = customCaCerts;
 
       return this;
@@ -434,7 +426,7 @@ public class Http {
      * @param value   Header's value
      * @return the Builder
      */
-    public HttpBuilder addAdditionalDuoHeader(String name, String value) throws IllegalArgumentException{
+    public HttpBuilder<T> addAdditionalDuoHeader(String name, String value) throws IllegalArgumentException{
       validateXDuoHeader(name, value);
       this.additionalDuoHeaders.put(name.toLowerCase(), value);
       return this;
@@ -448,7 +440,7 @@ public class Http {
      * @param value   Header's value
      * @return the Builder
      */
-    public HttpBuilder addHeader(String name, String value){
+    public HttpBuilder<T> addHeader(String name, String value){
       this.headers.put(name, value);
       return this;
     }
@@ -458,8 +450,8 @@ public class Http {
      *
      * @return the specified Http client object
      */
-    public Http build() {
-      Http duoClient = new Http(method, host, uri, timeout);
+    public T build() {
+      T duoClient = createClient(method, host, uri, timeout);
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }
@@ -476,7 +468,7 @@ public class Http {
       return duoClient;
     }
 
-
+    protected abstract T createClient(String method, String host, String uri, int timeout);
 
     private void validateXDuoHeader(String name, String value) throws IllegalArgumentException{
       if (name == null || name.length() == 0){

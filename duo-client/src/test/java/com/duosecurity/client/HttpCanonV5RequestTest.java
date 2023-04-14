@@ -3,7 +3,7 @@ package com.duosecurity.client;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import com.duosecurity.client.Http.HttpBuilder;
+import com.duosecurity.client.Admin.AdminBuilder;
 import org.junit.Test;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,18 +15,18 @@ public class HttpCanonV5RequestTest {
     String hashedBody;
     String hasedEmptyAdditionalHeader = getHashedMessage("");
 
-    private static HttpBuilder postHttpBuilder() {
+    private static AdminBuilder postAdminBuilder() {
         // deliberately use the "wrong" case for method and host,
         // checking that those get canonicalized but URI's case is
         // preserved.
-        return new Http.HttpBuilder("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
+        return new Admin.AdminBuilder("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
     }
 
-    private static HttpBuilder getHttpBuilder() {
+    private static AdminBuilder getAdminBuilder() {
         // deliberately use the "wrong" case for method and host,
         // checking that those get canonicalized but URI's case is
         // preserved.
-        return new Http.HttpBuilder("gEt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
+        return new Admin.AdminBuilder("gEt", "foO.BAr52.cOm", "/Foo/BaR2/qux");
     }
 
     private String getHashedMessage(String message) {
@@ -46,7 +46,7 @@ public class HttpCanonV5RequestTest {
                 + hashedBody + "\n"
                 + hasedEmptyAdditionalHeader;
 
-        Http h = postHttpBuilder().build();
+        Admin h = postAdminBuilder().build();
         try {
             actual = h.canonRequest(date, 5);
         } catch (UnsupportedEncodingException e) {
@@ -71,7 +71,7 @@ public class HttpCanonV5RequestTest {
                 + hashedBody + "\n"
                 + hasedEmptyAdditionalHeader;
 
-        Http h = postHttpBuilder().build();
+        Admin h = postAdminBuilder().build();
         h.addParam("data", "abc123");
         h.addParam("alpha", new ArrayList<Object>() {
             {
@@ -111,7 +111,7 @@ public class HttpCanonV5RequestTest {
                 + hashedBody + "\n"
                 + hasedEmptyAdditionalHeader;
 
-        Http h = getHttpBuilder().build();
+        Admin h = getAdminBuilder().build();
         try {
             actual = h.canonRequest(date, 5);
         } catch (UnsupportedEncodingException e) {
@@ -135,7 +135,7 @@ public class HttpCanonV5RequestTest {
                 + hashedBody + "\n"
                 + hasedEmptyAdditionalHeader;
 
-        Http h = getHttpBuilder().build();
+        Admin h = getAdminBuilder().build();
         h.addParam("data", "abc123");
         try {
             actual = h.canonRequest(date, 5);
@@ -160,10 +160,10 @@ public class HttpCanonV5RequestTest {
                 + hashedBody + "\n"
                 + "60be11a30e0756f2ee2afdce1db849b987dcf86c1133394bd7bbbc9877920330c4d78aceacbb377ab8cbd9a8efe6a410fed4047376635ac71226ab46ca10d2b1";
 
-        HttpBuilder httpBuilder = postHttpBuilder();
+        AdminBuilder httpBuilder = postAdminBuilder();
         httpBuilder.addAdditionalDuoHeader("x-duo-A", "header_value_1");
         httpBuilder.addAdditionalDuoHeader("X-duo-B", "header_value_2");
-        Http h = httpBuilder.build();
+        Admin h = httpBuilder.build();
         try {
             actual = h.canonRequest(date, 5);
         } catch (UnsupportedEncodingException e) {

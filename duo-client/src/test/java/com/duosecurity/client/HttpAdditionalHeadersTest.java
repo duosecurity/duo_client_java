@@ -3,25 +3,25 @@ package com.duosecurity.client;
 
 import org.junit.Test;
 
-import com.duosecurity.client.Http.HttpBuilder;
+import com.duosecurity.client.Admin.AdminBuilder;
 
 import org.junit.Assert;
 
 public class HttpAdditionalHeadersTest {
-    private static HttpBuilder makeHttpBuilder() {
-        return new Http.HttpBuilder("GET", "example.test", "/foo/bar");
+    private static AdminBuilder makeAdminBuilder() {
+        return new Admin.AdminBuilder("GET", "example.test", "/foo/bar");
     }
 
     @Test
     public void testAddHeaders(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         h.addAdditionalDuoHeader("X-Duo-Header-1", "header_value_1");
         h.addAdditionalDuoHeader("X-Duo-Header-2", "header_value_2");
     }
 
     @Test
     public void testNullHeaderName(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         try {
             h.addAdditionalDuoHeader(null, "header_value_1");
         }
@@ -35,7 +35,7 @@ public class HttpAdditionalHeadersTest {
     }
     @Test
     public void testEmptyHeaderName(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         try {
             h.addAdditionalDuoHeader("", "header_value_1");
         }
@@ -50,7 +50,7 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testNullHeaderValue(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         try {
             h.addAdditionalDuoHeader("X-Duo-Header-1", null);
         }
@@ -65,7 +65,7 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testEmptyHeaderValue(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         try {
             h.addAdditionalDuoHeader("X-Duo-Header-1", "");
         }
@@ -80,7 +80,7 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testNonDuoHeader(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         try {
             h.addAdditionalDuoHeader("X-not-Duo-Header-1", "header_value_1");
         }
@@ -95,7 +95,7 @@ public class HttpAdditionalHeadersTest {
 
     @Test
     public void testDuplicatedHeader(){
-        HttpBuilder h = makeHttpBuilder();
+        AdminBuilder h = makeAdminBuilder();
         h.addAdditionalDuoHeader("X-Duo-Header-1", "header_value_1");
         try {
             h.addAdditionalDuoHeader("X-DUO-Header-1", "header_value_1");

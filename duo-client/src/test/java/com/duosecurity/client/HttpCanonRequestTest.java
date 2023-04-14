@@ -15,11 +15,11 @@ public class HttpCanonRequestTest {
         + "foo.bar52.com\n"
         + "/Foo/BaR2/qux\n";
 
-    private static Http makeHttp() {
+    private static Auth makeAuth() {
         // deliberately use the "wrong" case for method and host,
         // checking that those get canonicalized but URI's case is
         // preserved.
-        return new Http.HttpBuilder("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux").build();
+        return new Auth.AuthBuilder("PoSt", "foO.BAr52.cOm", "/Foo/BaR2/qux").build();
     }
 
     private void assertCanonRequest(String expected_query_string,
@@ -28,7 +28,7 @@ public class HttpCanonRequestTest {
                  : Collections2.permutations(Arrays.asList(params))) {
             String actual;
 
-            Http h = makeHttp();
+            Http h = makeAuth();
             for (String[] kv : a_params) {
                 h.addParam(kv[0], kv[1]);
             }

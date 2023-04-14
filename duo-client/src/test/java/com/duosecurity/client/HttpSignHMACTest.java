@@ -6,7 +6,7 @@ import org.junit.Assert;
 
 public class HttpSignHMACTest {
     private static Http makeHttp() {
-        return new Http.HttpBuilder("get", "API.test", "/v1/tEst").build();
+        return new Auth.AuthBuilder("get", "API.test", "/v1/tEst").build();
     }
 
     @Test
