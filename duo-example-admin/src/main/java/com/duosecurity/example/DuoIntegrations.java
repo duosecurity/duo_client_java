@@ -13,7 +13,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.json.JSONObject;
 
-import com.duosecurity.client.Http;
+import com.duosecurity.client.Admin;
 
 public class DuoIntegrations {
     private static String proxy_host = null;
@@ -77,7 +77,7 @@ public class DuoIntegrations {
 
         try {
             // Prepare request.
-            Http request = new Http.HttpBuilder("POST", cmd.getOptionValue("host"), "/admin/v2/integrations").build();
+            Admin request = new Admin.AdminBuilder("POST", cmd.getOptionValue("host"), "/admin/v2/integrations").build();
             request.addParam("name", "api-created integration");
             request.addParam("type", "sso-generic");
             request.addParam("sso", new JSONObject() {
@@ -139,7 +139,7 @@ public class DuoIntegrations {
                     });
                 }
             });
-            request.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"), 5);
+            request.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));
 
             // Use proxy if one was specified.
             if (proxy_host != null) {
