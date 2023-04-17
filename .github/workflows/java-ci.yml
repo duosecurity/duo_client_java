@@ -34,4 +34,5 @@ jobs:
           mvn test 
           --batch-mode 
           -file duo-client/pom.xml
-
+      - name: Lint with checkstyle
+        run: mvn checkstyle:check
