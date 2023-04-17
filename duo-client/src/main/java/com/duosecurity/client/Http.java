@@ -28,7 +28,7 @@ public class Http {
   public static final int DEFAULT_TIMEOUT_SECS = 60;
   private static final int RATE_LIMIT_ERROR_CODE = 429;
 
-  public static final String UserAgentString = "Duo API Java/0.6.0";
+  public static final String UserAgentString = "Duo API Java/0.6.0-SNAPSHOT";
 
   private final String method;
   private final String host;
