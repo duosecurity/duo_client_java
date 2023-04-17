@@ -19,7 +19,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import com.duosecurity.client.Http;
+import com.duosecurity.client.Admin;
 
 public class DuoAuthLogsV2 {
     private static String proxy_host = null;
@@ -83,7 +83,7 @@ public class DuoAuthLogsV2 {
         JSONObject metadata;
         try {
             // Prepare request.
-            Http request = new Http.HttpBuilder("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication").build();
+            Admin request = new Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication").build();
             String limit = "2";
             long mintime = System.currentTimeMillis() - (180 * 24 * 60 * 60 * 100);
             long maxtime = System.currentTimeMillis();
@@ -112,7 +112,7 @@ public class DuoAuthLogsV2 {
                 if (!metadata.isNull("next_offset")) {
                     System.out.println("Getting more logs...");
 					offset = metadata.getJSONArray("next_offset");
-                    request = new Http.HttpBuilder("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication").build();
+                    request = new Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v2/logs/authentication").build();
                     next_offset = offset.get(0).toString() + ',' + offset.get(1).toString();
                     request.addParam("next_offset", next_offset);
                     request.addParam("limit", limit);
