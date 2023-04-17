@@ -73,6 +73,9 @@ public class Http {
 
   /**
    * @deprecated Use the HttpBuilder instead
+   * @param inMethod    The method for the http request
+   * @param inHost      The api host provided by Duo and found in the Duo admin panel
+   * @param inUri       The endpoint for the request
    */
   public Http(String inMethod, String inHost, String inUri) {
     this(inMethod, inHost, inUri, DEFAULT_TIMEOUT_SECS);
@@ -209,7 +212,7 @@ public class Http {
    *
    * @param ikey        Integration key provided by Duo and found in the admin panel
    * @param skey        Secret key provided by Duo and found in the admin panel
-   * @param sigVersion  The version of signature used
+   * @param inSigVersion  The version of signature used
    *
    * @throws UnsupportedEncodingException For unsupported encodings
    */
