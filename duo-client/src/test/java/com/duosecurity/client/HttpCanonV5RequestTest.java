@@ -39,7 +39,7 @@ public class HttpCanonV5RequestTest {
         hashedBody = getHashedMessage("{}");
 
         String expected = date + "\n"
-                + "POST\n"
+                + "NOTPOST\n"
                 + "foo.bar52.com\n"
                 + "/Foo/BaR2/qux\n"
                 + "\n"
