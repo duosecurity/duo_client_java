@@ -25,9 +25,10 @@ public class DuoAdmin {
   private static int proxy_port = 0;
 
   /**
-   * The main function for the DuoAdmin example that will get users and authentication attempts.
+   * The main function for the DuoAdmin example that will get users and
+   * authentication attempts.
    *
-   * @param args    The command line arguments
+   * @param args The command line arguments
    */
   public static void main(String[] args) {
     System.out.println("Duo Admin Demo");
@@ -89,10 +90,10 @@ public class DuoAdmin {
     try {
       // Prepare request.
       Admin request = new Admin.AdminBuilder("GET",
-                                cmd.getOptionValue("host"),
-                                "/admin/v1/info/authentication_attempts").build();
+          cmd.getOptionValue("host"),
+          "/admin/v1/info/authentication_attempts").build();
       request.signRequest(cmd.getOptionValue("ikey"),
-                          cmd.getOptionValue("skey"));
+          cmd.getOptionValue("skey"));
 
       // Use proxy if one was specified.
       if (proxy_host != null) {
@@ -100,15 +101,14 @@ public class DuoAdmin {
       }
 
       // Send the request to Duo and parse the response.
-      result = (JSONObject)request.executeRequest();
+      result = (JSONObject) request.executeRequest();
       System.out.println("mintime = " + result.getInt("mintime"));
       System.out.println("maxtime = " + result.getInt("maxtime"));
 
-      JSONObject attempts
-          = result.getJSONObject("authentication_attempts");
+      JSONObject attempts = result.getJSONObject("authentication_attempts");
       Iterator<?> keys = attempts.keys();
       while (keys.hasNext()) {
-        String key = (String)keys.next();
+        String key = (String) keys.next();
         System.out.println(key + " count = " + attempts.getInt(key));
       }
     } catch (Exception e) {
@@ -123,7 +123,8 @@ public class DuoAdmin {
     JSONObject metadata;
     try {
       // Prepare request.
-      Admin request = new Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
+      Admin request = new 
+          Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
       String limit = "10";
       request.addParam("offset", "0");
       request.addParam("limit", limit);
@@ -147,7 +148,8 @@ public class DuoAdmin {
         if (!metadata.isNull("next_offset")) {
           offset = metadata.getInt("next_offset");
 
-          request = new Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
+          request = new 
+              Admin.AdminBuilder("GET", cmd.getOptionValue("host"), "/admin/v1/users").build();
           request.addParam("offset", Integer.toString(offset));
           request.addParam("limit", limit);
           request.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));

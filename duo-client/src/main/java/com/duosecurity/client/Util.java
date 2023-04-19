@@ -1,21 +1,20 @@
 package com.duosecurity.client;
 
-import okhttp3.CertificatePinner;
-
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import okhttp3.CertificatePinner;
 
 public class Util {
   /**
    * Creates a hmac of textBytes.
    *
-   * @param algorithm   The algorithm used to create the hmac
-   * @param keyBytes    The key used to initialize the hmac
-   * @param textBytes   The text in bytes used to create the hmac
+   * @param algorithm The algorithm used to create the hmac
+   * @param keyBytes  The key used to initialize the hmac
+   * @param textBytes The text in bytes used to create the hmac
    *
    * @return The hmac of testBytes
    *
@@ -33,9 +32,9 @@ public class Util {
   /**
    * Changes bytes to hex.
    *
-   * @param b    Byte array to be changed to a hex string
+   * @param b Byte array to be changed to a hex string
    *
-   * @return     The hex string of b
+   * @return The hex string of b
    */
   public static String bytes_to_hex(byte[] b) {
     String result = "";
@@ -48,15 +47,14 @@ public class Util {
   /**
    * Join elements from s together to make a string.
    *
-   * @param s       An object that will be joined to make a string
-   * @param joiner  A string used to join the elements of s together
+   * @param s      An object that will be joined to make a string
+   * @param joiner A string used to join the elements of s together
    *
-   * @return        The string made from joining elements of s and the joiner
+   * @return The string made from joining elements of s and the joiner
    */
   public static String join(Object[] s, String joiner) {
     int itemCount = s.length;
     if (itemCount == 0) {
-
 
       return "";
     }
@@ -75,35 +73,35 @@ public class Util {
   }
 
   /**
-   * Create a certificate pinner for the specified CA certificates
+   * Create a certificate pinner for the specified CA certificates.
    *
-   * @param apiHost   the host for pinning
-   * @param caCerts   the certificates to pin to
+   * @param apiHost the host for pinning
+   * @param caCerts the certificates to pin to
    * @return a CertificatePinner
    */
   public static CertificatePinner createPinner(String apiHost, String[] caCerts) {
     CertificatePinner pinner = new CertificatePinner.Builder()
-                                                    .add(apiHost, caCerts)
-                                                    .build();
+        .add(apiHost, caCerts)
+        .build();
 
     return pinner;
   }
 
   /**
-   * Create hash byte array of message
+   * Create hash byte array of message.
    *
-   * @param algorithm   The algorithm used to create the hash
-   * @param message     The text to create the hash
+   * @param algorithm The algorithm used to create the hash
+   * @param message   The text to create the hash
    * @return a byte array
    */
   public static byte[] hash(String algorithm, String message) {
-      MessageDigest digest;
-      try {
-        digest = MessageDigest.getInstance(algorithm);
-        byte[] encodedhash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
-        return encodedhash;
-      } catch (NoSuchAlgorithmException e) {
-        return new byte[0];
-      }
+    MessageDigest digest;
+    try {
+      digest = MessageDigest.getInstance(algorithm);
+      byte[] encodedhash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
+      return encodedhash;
+    } catch (NoSuchAlgorithmException e) {
+      return new byte[0];
+    }
   }
 }
