@@ -9,6 +9,7 @@ on:
     
 jobs:
   test:
+    name: Java CI - test
     runs-on: ubuntu-latest
 
     strategy:
