@@ -1,5 +1,5 @@
 name: Deploy to Maven
-on: workflow_dispatch
+# on: workflow_dispatch
 
 jobs:
   build:
@@ -17,20 +17,34 @@ jobs:
     - name: Build with Maven
       run: mvn -B package
 
-    - name: Set up Apache Maven Central
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        server-id: ossrh
-        server-username: MAVEN_USERNAME # env variable for username in deploy
-        server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
-        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
-        gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+    - name: Generate sbom output
+      run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeBom
 
-    - name: Publish to Apache Maven Central
-      run: mvn -Dgpg.passphrase=${{ secrets.MAVEN_GPG_PASSPHRASE }} -P release deploy
-      working-directory: ./duo-client
-      env:
-        MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-        MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+    - name: Install cycloneDX
+      run: |
+        wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.2/cyclonedx-linux-x64
+        chmod a+x cyclonedx-linux-x64
+      shell: bash
+
+    - name: Convert SBOM
+      run: |
+        ./cyclonedx-linux-x64 convert --input-format json --output-format spdxjson --input-file ./duo-client/target/cyclonedx-sbom.json --output-file spdx.json
+      shell: bash
+
+    # - name: Set up Apache Maven Central
+    #   uses: actions/setup-java@v1
+    #   with:
+    #     java-version: 1.8
+    #     server-id: ossrh
+    #     server-username: MAVEN_USERNAME # env variable for username in deploy
+    #     server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+    #     gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+    #     gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+
+    # - name: Publish to Apache Maven Central
+    #   run: mvn -Dgpg.passphrase=${{ secrets.MAVEN_GPG_PASSPHRASE }} -P release deploy
+    #   working-directory: ./duo-client
+    #   env:
+    #     MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+    #     MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+    #     MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
