@@ -30,6 +30,12 @@ jobs:
       run: |
         ./cyclonedx-linux-x64 convert --input-format json --output-format spdxjson --input-file ./duo-client/target/cyclonedx-sbom.json --output-file spdx.json
       shell: bash
+    
+    - name: Archive SBOM artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: sbom file
+        path: spdx.json
 
     # - name: Set up Apache Maven Central
     #   uses: actions/setup-java@v1
