@@ -18,18 +18,10 @@ jobs:
       run: mvn -B package
 
     - name: Generate sbom output
-      run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeBom
-
-    - name: Install cycloneDX
-      run: |
-        wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.2/cyclonedx-linux-x64
-        chmod a+x cyclonedx-linux-x64
-      shell: bash
+      run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeBom && mv ./duo-client/target/cyclonedx-sbom.json ./cyclonedx-sbom.json
 
     - name: Convert SBOM
-      run: |
-        ./cyclonedx-linux-x64 convert --input-format json --output-format spdxjson --input-file ./duo-client/target/cyclonedx-sbom.json --output-file spdx.json
-      shell: bash
+      uses: duosecurity/duo_client_python/.github/actions/sbom-convert@master
 
     - name: Archive SBOM artifacts
       uses: actions/upload-artifact@v3
