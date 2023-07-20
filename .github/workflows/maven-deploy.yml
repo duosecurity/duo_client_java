@@ -17,6 +17,18 @@ jobs:
     - name: Build with Maven
       run: mvn -B package
 
+    - name: Generate sbom output
+      run: mvn org.cyclonedx:cyclonedx-maven-plugin:makeBom && mv ./duo-client/target/cyclonedx-sbom.json ./cyclonedx-sbom.json
+
+    - name: Convert SBOM
+      uses: duosecurity/duo_client_python/.github/actions/sbom-convert@master
+
+    - name: Archive SBOM artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: duo_client_java_sbom
+        path: spdx.json
+
     - name: Set up Apache Maven Central
       uses: actions/setup-java@v1
       with:

@@ -123,6 +123,23 @@
           <parallel>methods</parallel>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+        <configuration>
+            <outputFormat>json</outputFormat>
+            <outputName>cyclonedx-sbom</outputName>
+        </configuration>
+        <version>2.7.9</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+              <goals>
+                  <goal>makeAggregateBom</goal>
+              </goals>
+            </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
