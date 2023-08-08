@@ -355,15 +355,15 @@ public class Http {
           .replace("*", "%2A")
           .replace("%7E", "~");
       if (params.get(key) instanceof List) {
-        List<String> value_list = (List<String>) params.get(key);
-        for (String i :  value_list) {
+        List<String> paramsValueList = (List<String>) params.get(key);
+        for (String i :  paramsValueList) {
           String value = URLEncoder
-            .encode(i.toString(), "UTF-8")
-            .replace("+", "%20")
-            .replace("*", "%2A")
-            .replace("%7E", "~");
+              .encode(i.toString(), "UTF-8")
+              .replace("+", "%20")
+              .replace("*", "%2A")
+              .replace("%7E", "~");
           args.add(name + "=" + value);
-        };
+        }
       } else {
         String value = URLEncoder
             .encode(params.get(key).toString(), "UTF-8")
