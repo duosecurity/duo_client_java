@@ -2,6 +2,7 @@ package com.duosecurity.client;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.duosecurity.client.Http.HttpBuilder;
 import org.junit.Test;
@@ -131,12 +132,20 @@ public class HttpCanonV5RequestTest {
                 + "GET\n"
                 + "foo.bar52.com\n"
                 + "/Foo/BaR2/qux\n"
-                + "data=abc123\n"
+                + "data=abc123&list=a&list=b&list=c&list=d\n"
                 + hashedBody + "\n"
                 + hasedEmptyAdditionalHeader;
 
         Http h = getHttpBuilder().build();
         h.addParam("data", "abc123");
+        h.addParam("list", new ArrayList<Object>() {
+            {
+                add("a");
+                add("b");
+                add("c");
+                add("d");
+            }
+        });
         try {
             actual = h.canonRequest(date, 5);
         } catch (UnsupportedEncodingException e) {

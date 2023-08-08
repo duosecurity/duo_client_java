@@ -340,7 +340,6 @@ public class Http {
       canon += canonBody + System.lineSeparator();
       canon += Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonXDuoHeaders()));
     }
-
     return canon;
   }
 
@@ -354,13 +353,26 @@ public class Http {
           .replace("+", "%20")
           .replace("*", "%2A")
           .replace("%7E", "~");
-      String value = URLEncoder
-          .encode(params.get(key).toString(), "UTF-8")
-          .replace("+", "%20")
-          .replace("*", "%2A")
-          .replace("%7E", "~");
-      args.add(name + "=" + value);
+      if (params.get(key) instanceof List) {
+        List<String> value_list = (List<String>) params.get(key);
+        for (String i :  value_list) {
+          String value = URLEncoder
+            .encode(i.toString(), "UTF-8")
+            .replace("+", "%20")
+            .replace("*", "%2A")
+            .replace("%7E", "~");
+          args.add(name + "=" + value);
+        };
+      } else {
+        String value = URLEncoder
+            .encode(params.get(key).toString(), "UTF-8")
+            .replace("+", "%20")
+            .replace("*", "%2A")
+            .replace("%7E", "~");
+        args.add(name + "=" + value);
+      }
     }
+
 
     return Util.join(args.toArray(), "&");
   }
