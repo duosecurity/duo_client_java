@@ -2,7 +2,6 @@ package com.duosecurity.client;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.duosecurity.client.Http.HttpBuilder;
 import org.junit.Test;
