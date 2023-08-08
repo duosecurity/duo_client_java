@@ -340,6 +340,7 @@ public class Http {
       canon += canonBody + System.lineSeparator();
       canon += Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonXDuoHeaders()));
     }
+
     return canon;
   }
 
@@ -372,7 +373,6 @@ public class Http {
         args.add(name + "=" + value);
       }
     }
-
 
     return Util.join(args.toArray(), "&");
   }
