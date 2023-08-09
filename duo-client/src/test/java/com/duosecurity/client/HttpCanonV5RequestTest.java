@@ -139,10 +139,10 @@ public class HttpCanonV5RequestTest {
         h.addParam("data", "abc123");
         h.addParam("list", new ArrayList<Object>() {
             {
-                add("a");
-                add("b");
-                add("c");
                 add("d");
+                add("c");
+                add("b");
+                add("a");
             }
         });
         try {

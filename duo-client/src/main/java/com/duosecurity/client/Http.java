@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -356,6 +357,7 @@ public class Http {
           .replace("%7E", "~");
       if (params.get(key) instanceof List) {
         List<String> paramsValueList = (List<String>) params.get(key);
+        Collections.sort(paramsValueList);
         for (String i :  paramsValueList) {
           String value = URLEncoder
               .encode(i.toString(), "UTF-8")
