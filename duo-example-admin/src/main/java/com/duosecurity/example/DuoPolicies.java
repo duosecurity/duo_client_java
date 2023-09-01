@@ -7,6 +7,7 @@ package com.duosecurity.example;
  */
 
 import com.duosecurity.client.Admin;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
@@ -79,7 +80,8 @@ public class DuoPolicies {
     }
 
     printGlobalPolicy(cmd);
-    createNewPolicy(cmd);
+    String new_policy_key = createNewPolicy(cmd);
+    copyPolicy(cmd, new_policy_key);
     printAllPolicies(cmd);
   }
 
@@ -106,7 +108,7 @@ public class DuoPolicies {
     }
   }
 
-  private static void createNewPolicy(CommandLine cmd) {
+  private static String createNewPolicy(CommandLine cmd) {
     // Create a new policy and print it to stdout.
     System.out.println("Creating New Policy");
     try {
@@ -114,7 +116,7 @@ public class DuoPolicies {
           "POST",
           cmd.getOptionValue("host"),
           "/admin/v2/policies").build();
-      adminRequest.addParam("name", "New Sample Policy");
+      adminRequest.addParam("policy_name", "New Sample Policy");
       adminRequest.addParam("sections",
           new JSONObject()
               .put("authentication_methods",
@@ -137,6 +139,36 @@ public class DuoPolicies {
         adminRequest.setProxy(proxy_host, proxy_port);
       }
 
+      JSONObject result = (JSONObject) adminRequest.executeJSONRequest();
+      System.out.println(result.toString(4));
+      return result.getJSONObject("response").getString("policy_key");
+    } catch (Exception e) {
+      System.out.println("Error making request");
+      System.out.println(e.toString());
+      return null;
+    }
+  }
+
+  private static void copyPolicy(CommandLine cmd, String policyToCopy) {
+    System.out.println("Copying policy");
+    try {
+      Admin adminRequest = new Admin.AdminBuilder(
+        "POST",
+        cmd.getOptionValue("host"),
+        "/admin/v2/policies/copy").build();
+      adminRequest.addParam("policy_key", policyToCopy);
+      adminRequest.addParam("new_policy_names_list", new ArrayList<Object>() {
+        {
+            add("New Copied Policy 1");
+            add("New Copied Policy 2");
+        }
+      });
+      adminRequest.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));
+
+      // optional proxy
+      if (proxy_host != null) {
+        adminRequest.setProxy(proxy_host, proxy_port);
+      }
       JSONObject result = (JSONObject) adminRequest.executeJSONRequest();
       System.out.println(result.toString(4));
     } catch (Exception e) {
