@@ -209,7 +209,7 @@ public class DuoPolicies {
           System.out.println(
               String.format(
                   "Policy w/ name: \"%s\"",
-                  policies.getJSONObject(x).getString("name")));
+                  policies.getJSONObject(x).getString("policy_name")));
         }
 
         // If next_offset doesn't exist we have reached the end of the dataset.
