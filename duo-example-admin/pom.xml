@@ -27,8 +27,8 @@
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
-      <artifactId>org.json</artifactId>
-      <version>chargebee-1.0</version>
+      <artifactId>json</artifactId>
+      <version>20230618</version>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
