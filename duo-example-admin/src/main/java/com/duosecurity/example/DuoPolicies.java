@@ -80,8 +80,8 @@ public class DuoPolicies {
     }
 
     printGlobalPolicy(cmd);
-    String new_policy_key = createNewPolicy(cmd);
-    copyPolicy(cmd, new_policy_key);
+    String newPolicyKey = createNewPolicy(cmd);
+    copyPolicy(cmd, newPolicyKey);
     printAllPolicies(cmd);
   }
 
@@ -153,14 +153,14 @@ public class DuoPolicies {
     System.out.println("Copying policy");
     try {
       Admin adminRequest = new Admin.AdminBuilder(
-        "POST",
-        cmd.getOptionValue("host"),
-        "/admin/v2/policies/copy").build();
+          "POST",
+          cmd.getOptionValue("host"),
+          "/admin/v2/policies/copy").build();
       adminRequest.addParam("policy_key", policyToCopy);
       adminRequest.addParam("new_policy_names_list", new ArrayList<Object>() {
         {
-            add("New Copied Policy 1");
-            add("New Copied Policy 2");
+          add("New Copied Policy 1");
+          add("New Copied Policy 2");
         }
       });
       adminRequest.signRequest(cmd.getOptionValue("ikey"), cmd.getOptionValue("skey"));
