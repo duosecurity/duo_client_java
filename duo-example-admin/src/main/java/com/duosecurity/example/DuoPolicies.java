@@ -85,8 +85,12 @@ public class DuoPolicies {
     printAllPolicies(cmd);
   }
 
+  /**
+   * Print the global policy to stdout.
+   * 
+   * @param cmd the command line arguments
+   */
   private static void printGlobalPolicy(CommandLine cmd) {
-    // Print the global policy to stdout.
     System.out.println("Getting Global Policy");
     try {
       Admin adminRequest = new Admin.AdminBuilder(
@@ -108,8 +112,13 @@ public class DuoPolicies {
     }
   }
 
+  /**
+   * Create a new policy and print it to stdout.
+   * 
+   * @param cmd the command line arguments
+   * @return the new policy's policy_key
+   */
   private static String createNewPolicy(CommandLine cmd) {
-    // Create a new policy and print it to stdout.
     System.out.println("Creating New Policy");
     try {
       Admin adminRequest = new Admin.AdminBuilder(
@@ -149,6 +158,12 @@ public class DuoPolicies {
     }
   }
 
+  /**
+   * Copy an existing policy twice and print to stdout.
+   * 
+   * @param cmd           the command line arguments
+   * @param policyToCopy  the policy_key to copy
+   */
   private static void copyPolicy(CommandLine cmd, String policyToCopy) {
     System.out.println("Copying policy");
     try {
@@ -177,8 +192,12 @@ public class DuoPolicies {
     }
   }
 
+  /**
+   * Page through all policies and print the names to stdout.
+   * 
+   * @param cmd the command line arguments
+   */
   private static void printAllPolicies(CommandLine cmd) {
-    // Page through all policies and print the names to stdout.
     System.out.println("Printing All Policies");
     try {
       int limit = 10;
