@@ -23,6 +23,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Http {
@@ -280,6 +282,10 @@ public class Http {
   }
 
   public void addParam(String name, List<Object> value) {
+    params.put(name, value);
+  }
+
+  public void addParam(String name, JSONArray value) {
     params.put(name, value);
   }
 
