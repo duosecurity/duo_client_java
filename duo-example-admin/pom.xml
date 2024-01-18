@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.duosecurity</groupId>
   <artifactId>duo-example-admin</artifactId>
-  <version>0.6.1</version>
+  <version>0.6.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Duo Admin API Example client</name>
@@ -16,14 +16,14 @@
   <parent>
     <groupId>com.duosecurity</groupId>
     <artifactId>duo-client-all</artifactId>
-    <version>0.6.1</version>
+    <version>0.6.2-SNAPSHOT</version>
   </parent>
 
   <dependencies>
     <dependency>
       <groupId>com.duosecurity</groupId>
       <artifactId>duo-client</artifactId>
-      <version>0.6.1</version>
+      <version>0.6.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
