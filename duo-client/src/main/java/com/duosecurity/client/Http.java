@@ -314,30 +314,30 @@ public class Http {
     String canonParam;
     String canonBody;
     if (sigVersion == 1) {
-      canon += method.toUpperCase() + System.lineSeparator();
-      canon += host.toLowerCase() + System.lineSeparator();
-      canon += uri + System.lineSeparator();
+      canon += method.toUpperCase() + "\n";
+      canon += host.toLowerCase() + "\n";
+      canon += uri + "\n";
       canon += canonQueryString();
     } else if (sigVersion == 2) {
-      canon += date + System.lineSeparator();
-      canon += method.toUpperCase() + System.lineSeparator();
-      canon += host.toLowerCase() + System.lineSeparator();
-      canon += uri + System.lineSeparator();
+      canon += date + "\n";
+      canon += method.toUpperCase() + "\n";
+      canon += host.toLowerCase() + "\n";
+      canon += uri + "\n";
       canon += canonQueryString();
     } else if (sigVersion == 5) {
-      canon += date + System.lineSeparator();
-      canon += method.toUpperCase() + System.lineSeparator();
-      canon += host.toLowerCase() + System.lineSeparator();
-      canon += uri + System.lineSeparator();
+      canon += date + "\n";
+      canon += method.toUpperCase() + "\n";
+      canon += host.toLowerCase() + "\n";
+      canon += uri + "\n";
       if ("POST".equals(method) || "PUT".equals(method)) {
-        canonParam = System.lineSeparator();
+        canonParam = "\n";
         canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonJSONBody()));
       } else {
-        canonParam = canonQueryString() + System.lineSeparator();
+        canonParam = canonQueryString() + "\n";
         canonBody = Util.bytes_to_hex(Util.hash(hashingAlgorithm, ""));
       }
       canon += canonParam;
-      canon += canonBody + System.lineSeparator();
+      canon += canonBody + "\n";
       canon += Util.bytes_to_hex(Util.hash(hashingAlgorithm, canonXDuoHeaders()));
     }
 
