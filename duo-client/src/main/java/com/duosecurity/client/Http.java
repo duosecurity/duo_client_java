@@ -127,7 +127,7 @@ public class Http {
     JSONObject result = new JSONObject(executeRequestRaw());
     if (!result.getString("stat").equals("OK")) {
       throw new Exception("Duo error code ("
-          + result.getInt("code")
+          + result.get("code").toString()
           + "): "
           + result.getString("message"));
     }
