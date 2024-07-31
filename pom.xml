@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.duosecurity</groupId>
   <artifactId>duo-client-all</artifactId>
-  <version>0.6.3-SNAPSHOT</version>
+  <version>0.6.3</version>
   <packaging>pom</packaging>
 
   <name>Duo Security API client and examples</name>
