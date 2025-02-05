@@ -41,7 +41,7 @@ public class Http {
   private final String hashingAlgorithm = "SHA-512";
   private Headers.Builder headers;
   private SortedMap<String, Object> params = new TreeMap<String, Object>();
-  protected int sigVersion = 2;
+  protected int sigVersion = 5;
   private Random random = new Random();
   private OkHttpClient httpClient;
   private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
