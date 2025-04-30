@@ -24,7 +24,7 @@ jobs:
       uses: duosecurity/duo_client_python/.github/actions/sbom-convert@master
 
     - name: Archive SBOM artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: duo_client_java_sbom
         path: spdx.json
