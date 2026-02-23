@@ -42,6 +42,7 @@ public class Http {
   private Headers.Builder headers;
   private SortedMap<String, Object> params = new TreeMap<String, Object>();
   protected int sigVersion = 5;
+  private long maxBackoffMs = MAX_BACKOFF_MS;
   private Random random = new Random();
   private OkHttpClient httpClient;
   private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
@@ -314,7 +315,7 @@ public class Http {
     long backoffMs = INITIAL_BACKOFF_MS;
     while (true) {
       Response response = httpClient.newCall(request).execute();
-      if (response.code() != RATE_LIMIT_ERROR_CODE || backoffMs > MAX_BACKOFF_MS) {
+      if (response.code() != RATE_LIMIT_ERROR_CODE || backoffMs > maxBackoffMs) {
         return response;
       }
 
@@ -325,6 +326,10 @@ public class Http {
 
   protected void sleep(long ms) throws Exception {
     Thread.sleep(ms);
+  }
+
+  protected void setMaxBackoffMs(long maxBackoffMs) {
+    this.maxBackoffMs = maxBackoffMs;
   }
 
   public void signRequest(String ikey, String skey)
@@ -529,6 +534,7 @@ public class Http {
     private final String uri;
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
+    private long maxBackoffMs = MAX_BACKOFF_MS;
     private String[] caCerts = null;
     private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
     private Map<String, String> headers = new HashMap<String, String>();
@@ -554,6 +560,21 @@ public class Http {
      */
     public ClientBuilder<T> useTimeout(int timeout) {
       this.timeout = timeout;
+
+      return this;
+    }
+
+    /**
+     * Set the maximum backoff time in milliseconds for rate limit (429) retries.
+     * When a request receives a 429 response, the client retries with exponential
+     * backoff until the backoff exceeds this threshold. Setting to 0 disables retries.
+     * Default is 32000ms (32 seconds).
+     *
+     * @param maxBackoffMs the maximum backoff in milliseconds
+     * @return the Builder
+     */
+    public ClientBuilder<T> useMaxBackoffMs(long maxBackoffMs) {
+      this.maxBackoffMs = maxBackoffMs;
 
       return this;
     }
@@ -604,6 +625,7 @@ public class Http {
      */
     public T build() {
       T duoClient = createClient(method, host, uri, timeout);
+      duoClient.setMaxBackoffMs(maxBackoffMs);
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }
