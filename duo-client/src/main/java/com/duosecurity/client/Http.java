@@ -329,6 +329,9 @@ public class Http {
   }
 
   protected void setMaxBackoffMs(long maxBackoffMs) {
+    if (maxBackoffMs < 0) {
+      throw new IllegalArgumentException("maxBackoffMs must be >= 0");
+    }
     this.maxBackoffMs = maxBackoffMs;
   }
 
@@ -565,15 +568,20 @@ public class Http {
     }
 
     /**
-     * Set the maximum backoff time in milliseconds for rate limit (429) retries.
+     * Set the maximum base backoff time in milliseconds for rate limit (429) retries.
      * When a request receives a 429 response, the client retries with exponential
-     * backoff until the backoff exceeds this threshold. Setting to 0 disables retries.
-     * Default is 32000ms (32 seconds).
+     * backoff until the base backoff exceeds this threshold. Note that actual sleep
+     * time includes up to 1000ms of random jitter on top of the base backoff.
+     * Setting to 0 disables retries. Default is 32000ms (32 seconds).
      *
-     * @param maxBackoffMs the maximum backoff in milliseconds
+     * @param maxBackoffMs the maximum base backoff in milliseconds (must be >= 0)
      * @return the Builder
+     * @throws IllegalArgumentException if maxBackoffMs is negative
      */
     public ClientBuilder<T> useMaxBackoffMs(long maxBackoffMs) {
+      if (maxBackoffMs < 0) {
+        throw new IllegalArgumentException("maxBackoffMs must be >= 0");
+      }
       this.maxBackoffMs = maxBackoffMs;
 
       return this;

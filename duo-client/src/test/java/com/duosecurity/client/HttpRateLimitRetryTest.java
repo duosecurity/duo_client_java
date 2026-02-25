@@ -208,4 +208,11 @@ public class HttpRateLimitRetryTest {
         assertEquals(2000L + RANDOM_INT, (long) sleepTimes.get(1));
         assertEquals(4000L + RANDOM_INT, (long) sleepTimes.get(2));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxBackoffNegativeThrows() {
+        new Http.HttpBuilder("GET", "example.test", "/foo/bar")
+                .useMaxBackoffMs(-1)
+                .build();
+    }
 }
