@@ -209,6 +209,17 @@ public class HttpRateLimitRetryTest {
         assertEquals(4000L + RANDOM_INT, (long) sleepTimes.get(2));
     }
 
+    @Test
+    public void testDefaultMaxBackoffIsUsedWhenNotSpecified() throws Exception {
+        Http defaultHttp = new Http.HttpBuilder("GET", "example.test", "/foo/bar").build();
+
+        Field maxBackoffField = Http.class.getDeclaredField("maxBackoffMs");
+        maxBackoffField.setAccessible(true);
+        long actualMaxBackoff = (long) maxBackoffField.get(defaultHttp);
+
+        assertEquals(Http.MAX_BACKOFF_MS, actualMaxBackoff);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testMaxBackoffNegativeThrows() {
         new Http.HttpBuilder("GET", "example.test", "/foo/bar")
