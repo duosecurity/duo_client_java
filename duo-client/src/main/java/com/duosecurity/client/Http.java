@@ -576,7 +576,13 @@ public class Http {
      * When a request receives a 429 response, the client retries with exponential
      * backoff until the base backoff exceeds this threshold. Note that actual sleep
      * time includes up to 1000ms of random jitter on top of the base backoff.
-     * Setting to 0 disables retries. Default is 32000ms (32 seconds).
+     * Setting to 0 disables retries (as does any value below the initial
+     * backoff of 1000ms). Default is 32000ms (32 seconds).
+     *
+     * <p>Note: When using method chaining from outside this package (e.g. with
+     * {@code AuthBuilder} or {@code AdminBuilder}), assign the builder to a variable
+     * and call methods separately, then call {@code build()}. This is a known
+     * limitation of all {@code ClientBuilder} methods.
      *
      * @param maxBackoffMs the maximum base backoff in milliseconds (must be >= 0)
      * @return the Builder
