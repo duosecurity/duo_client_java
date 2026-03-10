@@ -15,7 +15,7 @@ import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
 
-public class HttpRateLimitRetryIntegrationTest {
+public class HttpRateLimitRetryIntegrationIT {
 
     private MockWebServer server;
     private HandshakeCertificates clientCerts;
