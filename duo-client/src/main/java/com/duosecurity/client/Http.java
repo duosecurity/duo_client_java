@@ -318,6 +318,10 @@ public class Http {
         return response;
       }
 
+      // Close the 429 response to release the connection back to the pool before retrying
+      if (response.body() != null) {
+        response.close();
+      }
       sleep(backoffMs + nextRandomInt(1000));
       backoffMs *= BACKOFF_FACTOR;
     }
