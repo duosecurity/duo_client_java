@@ -26,10 +26,8 @@ public class HttpRateLimitRetryTest {
 
     private final int RANDOM_INT = 234;
 
-    @Before
-    public void before() throws Exception {
-        http = new Http.HttpBuilder("GET", "example.test", "/foo/bar").build();
-        http = Mockito.spy(http);
+    private void setupHttp(Http client) throws Exception {
+        http = Mockito.spy(client);
 
         Field httpClientField = Http.class.getDeclaredField("httpClient");
         httpClientField.setAccessible(true);
@@ -37,6 +35,12 @@ public class HttpRateLimitRetryTest {
 
         Mockito.when(http.nextRandomInt(1000)).thenReturn(RANDOM_INT);
         Mockito.doNothing().when(http).sleep(Mockito.any(Long.class));
+    }
+
+    @Before
+    public void before() throws Exception {
+        Http client = new Http.HttpBuilder("GET", "example.test", "/foo/bar").build();
+        setupHttp(client);
     }
 
     @Test
@@ -127,5 +131,99 @@ public class HttpRateLimitRetryTest {
         assertEquals(8000L + RANDOM_INT, (long) sleepTimes.get(3));
         assertEquals(16000L + RANDOM_INT, (long) sleepTimes.get(4));
         assertEquals(32000L + RANDOM_INT, (long) sleepTimes.get(5));
+    }
+
+    @Test
+    public void testMaxBackoffZeroDisablesRetry() throws Exception {
+        Http customHttp = new Http.HttpBuilder("GET", "example.test", "/foo/bar")
+                .useMaxBackoffMs(0)
+                .build();
+        setupHttp(customHttp);
+
+        final List<Response> responses = new ArrayList<Response>();
+
+        Mockito.when(httpClient.newCall(Mockito.any(Request.class))).thenAnswer(new Answer<Call>() {
+            @Override
+            public Call answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Call call = Mockito.mock(Call.class);
+
+                Response resp = new Response.Builder()
+                        .protocol(Protocol.HTTP_2)
+                        .code(429)
+                        .request((Request) invocationOnMock.getArguments()[0])
+                        .message("HTTP 429")
+                        .build();
+                responses.add(resp);
+                Mockito.when(call.execute()).thenReturn(resp);
+
+                return call;
+            }
+        });
+
+        Response actualRes = http.executeHttpRequest();
+        assertEquals(1, responses.size());
+        assertEquals(429, actualRes.code());
+
+        // Verify no sleep was called
+        Mockito.verify(http, Mockito.never()).sleep(Mockito.any(Long.class));
+    }
+
+    @Test
+    public void testMaxBackoffCustomLimit() throws Exception {
+        Http customHttp = new Http.HttpBuilder("GET", "example.test", "/foo/bar")
+                .useMaxBackoffMs(4000)
+                .build();
+        setupHttp(customHttp);
+
+        final List<Response> responses = new ArrayList<Response>();
+
+        Mockito.when(httpClient.newCall(Mockito.any(Request.class))).thenAnswer(new Answer<Call>() {
+            @Override
+            public Call answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Call call = Mockito.mock(Call.class);
+
+                Response resp = new Response.Builder()
+                        .protocol(Protocol.HTTP_2)
+                        .code(429)
+                        .request((Request) invocationOnMock.getArguments()[0])
+                        .message("HTTP 429")
+                        .build();
+                responses.add(resp);
+                Mockito.when(call.execute()).thenReturn(resp);
+
+                return call;
+            }
+        });
+
+        // With maxBackoff=4000, retries at 1000, 2000, 4000, then 8000 > 4000 exits
+        // That's 4 total requests (1 initial + 3 retries)
+        Response actualRes = http.executeHttpRequest();
+        assertEquals(4, responses.size());
+        assertEquals(429, actualRes.code());
+
+        ArgumentCaptor<Long> sleepCapture = ArgumentCaptor.forClass(Long.class);
+        Mockito.verify(http, Mockito.times(3)).sleep(sleepCapture.capture());
+        List<Long> sleepTimes = sleepCapture.getAllValues();
+        assertEquals(1000L + RANDOM_INT, (long) sleepTimes.get(0));
+        assertEquals(2000L + RANDOM_INT, (long) sleepTimes.get(1));
+        assertEquals(4000L + RANDOM_INT, (long) sleepTimes.get(2));
+    }
+
+    @Test
+    public void testDefaultMaxBackoffIsUsedWhenNotSpecified() throws Exception {
+        Http defaultHttp = new Http.HttpBuilder("GET", "example.test", "/foo/bar").build();
+
+        Field maxBackoffField = Http.class.getDeclaredField("maxBackoffMs");
+        maxBackoffField.setAccessible(true);
+        long actualMaxBackoff = (long) maxBackoffField.get(defaultHttp);
+
+        assertEquals(Http.MAX_BACKOFF_MS, actualMaxBackoff);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxBackoffNegativeThrows() {
+        new Http.HttpBuilder("GET", "example.test", "/foo/bar")
+                .useMaxBackoffMs(-1)
+                .build();
     }
 }

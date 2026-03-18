@@ -42,6 +42,7 @@ public class Http {
   private Headers.Builder headers;
   private SortedMap<String, Object> params = new TreeMap<String, Object>();
   protected int sigVersion = 5;
+  private long maxBackoffMs = MAX_BACKOFF_MS;
   private Random random = new Random();
   private OkHttpClient httpClient;
   private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
@@ -314,7 +315,7 @@ public class Http {
     long backoffMs = INITIAL_BACKOFF_MS;
     while (true) {
       Response response = httpClient.newCall(request).execute();
-      if (response.code() != RATE_LIMIT_ERROR_CODE || backoffMs > MAX_BACKOFF_MS) {
+      if (response.code() != RATE_LIMIT_ERROR_CODE || backoffMs > maxBackoffMs) {
         return response;
       }
 
@@ -325,6 +326,13 @@ public class Http {
 
   protected void sleep(long ms) throws Exception {
     Thread.sleep(ms);
+  }
+
+  protected void setMaxBackoffMs(long maxBackoffMs) {
+    if (maxBackoffMs < 0) {
+      throw new IllegalArgumentException("maxBackoffMs must be >= 0");
+    }
+    this.maxBackoffMs = maxBackoffMs;
   }
 
   public void signRequest(String ikey, String skey)
@@ -529,6 +537,7 @@ public class Http {
     private final String uri;
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
+    private long maxBackoffMs = MAX_BACKOFF_MS;
     private String[] caCerts = null;
     private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
     private Map<String, String> headers = new HashMap<String, String>();
@@ -554,6 +563,32 @@ public class Http {
      */
     public ClientBuilder<T> useTimeout(int timeout) {
       this.timeout = timeout;
+
+      return this;
+    }
+
+    /**
+     * Set the maximum base backoff time in milliseconds for rate limit (429) retries.
+     * When a request receives a 429 response, the client retries with exponential
+     * backoff until the base backoff exceeds this threshold. Note that actual sleep
+     * time includes up to 1000ms of random jitter on top of the base backoff.
+     * Setting to 0 disables retries (as does any value below the initial
+     * backoff of 1000ms). Default is 32000ms (32 seconds).
+     *
+     * <p>Note: When using method chaining from outside this package (e.g. with
+     * {@code AuthBuilder} or {@code AdminBuilder}), assign the builder to a variable
+     * and call methods separately, then call {@code build()}. This is a known
+     * limitation of all {@code ClientBuilder} methods.
+     *
+     * @param maxBackoffMs the maximum base backoff in milliseconds (must be >= 0)
+     * @return the Builder
+     * @throws IllegalArgumentException if maxBackoffMs is negative
+     */
+    public ClientBuilder<T> useMaxBackoffMs(long maxBackoffMs) {
+      if (maxBackoffMs < 0) {
+        throw new IllegalArgumentException("maxBackoffMs must be >= 0");
+      }
+      this.maxBackoffMs = maxBackoffMs;
 
       return this;
     }
@@ -604,6 +639,7 @@ public class Http {
      */
     public T build() {
       T duoClient = createClient(method, host, uri, timeout);
+      duoClient.setMaxBackoffMs(maxBackoffMs);
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }

@@ -33,8 +33,8 @@ jobs:
           --file duo-client/pom.xml
       - name: Test with Maven
         run: >
-          mvn test 
-          --batch-mode 
+          mvn test
+          --batch-mode
           -file duo-client/pom.xml
       - name: Lint with checkstyle
         run: mvn checkstyle:check
