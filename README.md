@@ -53,7 +53,7 @@ For more information see the Duo Accounts API guide:
 The Java API Client project is available from Duo Security on Maven.  Include the following in your dependency definitions:
 ```
 
-<!-- https://mvnrepository.com/artifact/com.duosecurity/duo-client -->
+<!-- https://central.sonatype.com/artifact/com.duosecurity/duo-client -->
 <dependency>
     <groupId>com.duosecurity</groupId>
     <artifactId>duo-client</artifactId>
@@ -61,7 +61,7 @@ The Java API Client project is available from Duo Security on Maven.  Include th
 </dependency>
 ```
 
-See https://mvnrepository.com/artifact/com.duosecurity/duo-client/0.8.0 for more details.
+See https://central.sonatype.com/artifact/com.duosecurity/duo-client/0.8.0 for more details.
 
 # Using the Example
 There is an example in /duo-example-admin
