@@ -438,6 +438,16 @@ public class Http {
     httpClient = httpClient.newBuilder().certificatePinner(pinner).build();
   }
 
+  /**
+   * Disable CA certificate pinning. TLS verification remains active
+   * via the OS trust store.
+   */
+  public void disableCaPinning() {
+    httpClient = httpClient.newBuilder()
+        .certificatePinner(CertificatePinner.DEFAULT)
+        .build();
+  }
+
   protected String canonRequest(String date, int sigVersion)
       throws UnsupportedEncodingException {
     String canon = "";
@@ -543,6 +553,7 @@ public class Http {
     private int timeout = DEFAULT_TIMEOUT_SECS;
     private long maxBackoffMs = MAX_BACKOFF_MS;
     private String[] caCerts = null;
+    private boolean disableCaPinning = false;
     private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
     private Map<String, String> headers = new HashMap<String, String>();
 
@@ -610,6 +621,19 @@ public class Http {
     }
 
     /**
+     * Disable CA certificate pinning. TLS verification remains active
+     * via the OS trust store.
+     *
+     * @return the Builder
+     * @throws IllegalStateException if custom certificates have also been set
+     */
+    public ClientBuilder<T> disableCaPinning() {
+      this.disableCaPinning = true;
+
+      return this;
+    }
+
+    /**
      * Set additional x-duo header for the HTTP client.
      *
      * @param name  Header's name
@@ -642,10 +666,17 @@ public class Http {
      * @return the specified Http client object
      */
     public T build() {
+      if (disableCaPinning && caCerts != null) {
+        throw new IllegalStateException(
+            "Cannot both disable CA pinning and provide custom certificates");
+      }
       T duoClient = createClient(method, host, uri, timeout);
       duoClient.setMaxBackoffMs(maxBackoffMs);
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
+      }
+      if (disableCaPinning) {
+        duoClient.disableCaPinning();
       }
       if (additionalDuoHeaders != null) {
         duoClient.addAdditionalDuoHeader(additionalDuoHeaders);
