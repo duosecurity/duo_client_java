@@ -32,6 +32,7 @@ public class Http {
   public static final int DEFAULT_TIMEOUT_SECS = 60;
   private static final int RATE_LIMIT_ERROR_CODE = 429;
 
+  private static final String CA_BUNDLE_VERSION = "1.0";
   public static final String UserAgentString = "Duo API Java/0.8.1-SNAPSHOT";
 
   private final String method;
@@ -223,7 +224,8 @@ public class Http {
 
     headers = new Headers.Builder();
     headers.add("Host", host);
-    headers.add("user-agent", UserAgentString);
+    headers.add("user-agent", String.format("%s ca_bundle/%s (ca_pinning=%s)",
+        UserAgentString, CA_BUNDLE_VERSION, "enabled"));
 
     CertificatePinner pinner = Util.createPinner(host, DEFAULT_CA_CERTS);
 
@@ -395,6 +397,10 @@ public class Http {
 
   public void addHeader(String name, String value) {
     headers.add(name, value);
+  }
+
+  void setHeader(String name, String value) {
+    headers.set(name, value);
   }
 
   public void addParam(String name, String value) {
@@ -675,6 +681,9 @@ public class Http {
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }
+      String caPinningStatus = disableCaPinning ? "disabled" : "enabled";
+      duoClient.setHeader("user-agent", String.format("%s ca_bundle/%s (ca_pinning=%s)",
+          UserAgentString, CA_BUNDLE_VERSION, caPinningStatus));
       if (disableCaPinning) {
         duoClient.disableCaPinning();
       }
