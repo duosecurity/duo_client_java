@@ -681,9 +681,6 @@ public class Http {
       if (caCerts != null) {
         duoClient.useCustomCertificates(caCerts);
       }
-      String caPinningStatus = disableCaPinning ? "disabled" : "enabled";
-      duoClient.setHeader("user-agent", String.format("%s ca_bundle/%s (ca_pinning=%s)",
-          UserAgentString, CA_BUNDLE_VERSION, caPinningStatus));
       if (disableCaPinning) {
         duoClient.disableCaPinning();
       }
@@ -696,6 +693,9 @@ public class Http {
           duoClient.addHeader(name, value);
         }
       }
+      String caPinningStatus = disableCaPinning ? "disabled" : "enabled";
+      duoClient.setHeader("user-agent", String.format("%s ca_bundle/%s (ca_pinning=%s)",
+          UserAgentString, CA_BUNDLE_VERSION, caPinningStatus));
 
       return duoClient;
     }

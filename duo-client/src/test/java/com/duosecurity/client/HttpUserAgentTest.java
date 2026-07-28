@@ -1,5 +1,6 @@
 package com.duosecurity.client;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
@@ -8,11 +9,15 @@ import org.junit.Test;
 
 public class HttpUserAgentTest {
 
-  private String getUserAgent(Http http) throws Exception {
+  private Headers getHeaders(Http http) throws Exception {
     Field headersField = Http.class.getDeclaredField("headers");
     headersField.setAccessible(true);
     Headers.Builder headersBuilder = (Headers.Builder) headersField.get(http);
-    return headersBuilder.build().get("user-agent");
+    return headersBuilder.build();
+  }
+
+  private String getUserAgent(Http http) throws Exception {
+    return getHeaders(http).get("user-agent");
   }
 
   @Test
@@ -50,5 +55,17 @@ public class HttpUserAgentTest {
     String userAgent = getUserAgent(http);
     assertTrue(userAgent.contains("ca_bundle/1.0"));
     assertTrue(userAgent.contains("(ca_pinning=enabled)"));
+  }
+
+  @Test
+  public void testCustomUserAgentHeader_isReplacedNotDuplicated() throws Exception {
+    Http http = new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
+        .addHeader("user-agent", "MyApp/1.0")
+        .build();
+
+    Headers headers = getHeaders(http);
+    assertEquals(1, headers.values("user-agent").size());
+    assertEquals(String.format("%s ca_bundle/1.0 (ca_pinning=enabled)", Http.UserAgentString),
+        headers.get("user-agent"));
   }
 }
