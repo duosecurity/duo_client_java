@@ -63,6 +63,30 @@ The Java API Client project is available from Duo Security on Maven.  Include th
 
 See https://central.sonatype.com/artifact/com.duosecurity/duo-client/0.8.0 for more details.
 
+## Verifying releases
+
+Artifacts published to Maven Central are signed with one of Duo's Maven signing keys.
+The public keys are in [`KEYS`](KEYS) in this repository.
+
+```
+curl -O https://raw.githubusercontent.com/duosecurity/duo_client_java/master/KEYS
+gpg --import KEYS
+gpg --verify duo-client-0.8.0.jar.asc duo-client-0.8.0.jar
+```
+
+The `.jar.asc` signature files are available alongside each artifact on Maven Central,
+for example <https://repo1.maven.org/maven2/com/duosecurity/duo-client/0.8.0/>.
+
+| Versions | Key fingerprint |
+| --- | --- |
+| 0.8.0 and later | `7ED4 A780 3AFC 6DE8 47DF  9A3F 70EE 73F2 1701 2D0E` |
+| 0.3.0 through 0.7.1 | `20FF 0D66 B2D0 202C 1544  7339 7E77 F31E 27A4 AEA2` (expired 2026-01-27) |
+
+A `Good signature` result confirms the artifact was signed with a Duo key. GPG also
+reports the key as untrusted unless you have signed it yourself, and reports the
+retired key as expired; neither affects the validity of signatures made while that
+key was valid.
+
 # Using the Example
 There is an example in /duo-example-admin
 Create an Admin API application in your Duo Admin Panel.

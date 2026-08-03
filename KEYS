@@ -1,0 +1,113 @@
+This file contains the PGP keys used to sign duo_client_java releases
+published to Maven Central. It contains public key material only.
+
+Users:
+    gpg --import KEYS
+    gpg --verify duo-client-<version>.jar.asc duo-client-<version>.jar
+
+Developers:
+    Append new signing keys. Never replace this file or delete a key that has
+    signed a release, so signatures on earlier releases remain verifiable.
+
+    gpg --armor --export <key id> >> KEYS
+
+---------------------------------------------------------------------------
+
+Duo Security Maven Signing Key (current)
+Fingerprint: 7ED4 A780 3AFC 6DE8 47DF  9A3F 70EE 73F2 1701 2D0E
+Created: 2026-03-20   Expires: 2029-03-19
+Signs: duo-client 0.8.0 and later
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQINBGm9omcBEADMHBgnHZWEgo0M40t14zDSjaQ/F6f2NxOAxGTo6lEgNPYTlkRx
++MyK8Dzf2rkiioyeNLZ8SFpN4iH9Gdh8ah2L/YfDQPPUmu5h6vy6sxOX+MlfGZzl
+7djBFeT4qLUll3cRjahTYqaDzpyUpQ2YizhFWnAB7O8PJPueh1BtewNOjOio4OE2
+fwfY72JPQcaWwMT+eXGUBfLv2qIFJPymmYSM+D4qMVYC2a/iNWMvYNvqjDTFVhbn
+3zH2BOSYwG6LOdBKrsb3Ol6sUVGMEGUqqq2ly2icWQvAs2F15JPkstNp/qk7W7jM
++8Ed8vfufcEh/twPwefzzNmkLZVmmiBN0ImeyFHuuERIX+Pu3tdAuAl9LvRkf+Xr
+zWR6XKPadtzdUo2eH2atOOmmIpfdGhzFKPaklHJa56sAHXmhmk6YrHwyG4KaRDyh
+OnTaXSWqxchMlDwUzb4d29PqBm0l0xR6yVcVesX2uFW4rkYSYGqnJlY88PYCi2EU
+EdHI3ICejULExhb+P+oK1t6fR0WFVxo9ezFG06TDPhapSKX6FryTM/zifN+A6I1Y
+3Y3uj/mc4IYsf1nlwPbTnFp87TTGhOG3NcapHioO8Xxsg0D4JfD6KVYoTJZQUhV3
+NtPisT+FKPDBMHZODrNLjLUfMQWOV0F5817ZXRd8b0yhPq0wR6gObsAwRwARAQAB
+tDFEdW8gU2VjdXJpdHkgTWF2ZW4gU2lnbmluZyA8aW50ZWdyYXRpb25zQGR1by5j
+b20+iQJXBBMBCABBFiEEftSngDr8behH35o/cO5z8hcBLQ4FAmm9omcCGwMFCQWj
+moAFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQcO5z8hcBLQ7vYA/+OOKq
+XA0YY3D1C3TsxtMQ0l1SffVBJZv8O1W5vRqx1nDuCCsrFy6MWdMW+0/3cuS8td3b
+pjKiuvpUPVmFM3W8N9r3xVdR9b8BqHBT99OMI3D43qgXKjYbHsY3Qwuc2TZYYveV
+n9iXysi2hB70470Roa27lH52v4/zmLg+4m7CJxbTGTeQbSNDB+BWA7mmAvt1in3K
+Mx1svU8xPdGYnnmtClv4Q0IUXORlW1dsZIn+mTXaC5BDouPBskJjm+LQ8QZE+IQO
+1vH+HTuZNa6/OQfp/TLLEAkPmd3cl152P59yortHt+ZEQJz1ZqSevYpbSjl34P19
+BeX5hOKPF707vl4EVTPCgmYK8B0nJ6q9L+ESE5Jm/4CSwLXbEEIYVI8DzQyx+m3m
+wkKLN0toxFRbB8HD2nZo4lpsv3FESLjzQwL/jtK/fKaLhqoL9b+07vKAiAp8CBje
+zLsK2Tm/tZGWcEn5Z1eFCeTVsyBjJ177lQYJt2g5q3JLg5ntkeENIzO1x3c8uXF4
+Hehl9ytq0iXWqc2qH2NdWf9v9nKNhBSvibx8cOhuvBkT/eDCPPpv08ugQqphXdNV
+YpyF/GJ0djdj8s66rQ67DnQA/F7p9sJMvzoC/Wp6720iDcdMg7THKsaLcfeInNMv
+ovMZTpcapSUsjFNB7nOo7fNCuKIQLNXk6qFUQMQ=
+=tO2z
+-----END PGP PUBLIC KEY BLOCK-----
+
+---------------------------------------------------------------------------
+
+Duo Security Maven Signing Key (retired)
+Fingerprint: 20FF 0D66 B2D0 202C 1544  7339 7E77 F31E 27A4 AEA2
+Created: 2020-11-10   Expired: 2026-01-27
+Signs: duo-client 0.3.0 through 0.7.1
+Retained so that signatures made while this key was valid remain verifiable.
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQINBF+qv6UBEADMr0wAhf6oXcht0Y2l/DFFaaga+9UWoxQ/ARbxZZ1XZn8b6NYe
+3QZ6roGUCDfQ7FoaRbOKBbRV8uuiYlO60h6PUI72DjVikVeBXvFuZtA/eluHXSrf
+TENRgOcYtpYkvNI/564Ym/YhL+KovpImMd95iZs+lBscW4mL5fsQnHocQdYzQkxl
+r+g6KwkVrYGgWzMmN65tlVJ/SZUtRtOhVnGdTqiP7tkPr7BtM1A7+aZepuMuHceL
+r+h2l0ADFvl/2gZtmMzxqneu3SQRUZdQ3OK/sOBuLG4xCO0AYHgKfPBQqUd6ZVd/
+w9uLnczJawr2HUugQF8o05TB52fmJyIx0NNQDKYWEslV2eAGL4ZCywInCUqfcNY6
+DWccX9UE5+QNf09e3wrJ9bUEEuLY09daxXefF6y9iMLlzhqxunLyEX5grhF7TSLs
+gyP7xBVq7OrGndcAEaWB9xNxp7h36MNkU4vYjGFCHRooBrvU4rrTE9PrRYnRmtHy
+cjwNvJKYiuEJBObH7YsVkBMv6nPKUWOZqxjAmaNjUYNbKmc9f3XHTitWNVgpDyxC
+g1xkic34nERRgpNkceFOKhigGZ7Jy6u20XlkTrWRIpdUiNi+H4TyCsDK3KdVNJwi
+ZJGKfD3wNRdMuc/kyzMgR6g/7q6I2XZsKyHQrZy/g5Fsehaw1cAmcTEHowARAQAB
+tE9EdW8gU2VjdXJpdHkgTWF2ZW4gU2lnbmluZyAoRm9yIHNpZ25pbmcgTWF2ZW4g
+YXJ0aWZhY3RzKSA8aW50ZWdyYXRpb25zQGR1by5jb20+iQJWBBMBCABAAhsDBwsJ
+CAcDAgEGFQgCCQoLBBYCAwECHgECF4AWIQQg/w1mstAgLBVEczl+d/MeJ6SuogUC
+Z5fqqwUJCc5ehgAKCRB+d/MeJ6SuohS4D/9QN031uoseXrxGuv2//3nFVsviD/eb
+KOQVdMtSLqyDrImqdlKzqUNTWLTyDwsoX1F7GFylrPPMwvxXHw55yF2OaplDPceA
+0YBPvwRy5yzp3nS77VutKM0MCQT55MSXx2lZpcK7jPtnkBUnfKnZge0KNnT8N4Cc
+tjK2Oo8712PhB3xSQzCQld/Im7rIz5GGCr/DD7RQGirlH/6vKAGGpnP3N+ajdh/4
+dOPciBrCbi/yrOaGxUJJrVwKM9Q4+NuGBQjrB7ONkGCxW/2GhMXG7kNp9SLWx0Ct
+D+pBETuI6Y2gAPDyZog5axX0RGKxhq69GhZmh/a2VrotYx9a2RSIDjgpLWB1R37O
+aaR7xxN7idcAt8seTC3x4K6gw3DjzGeqReZpB4u3PsXin2xxAbyZsos7oxiRi7iX
+Zu8Bjf3wMXymDasBIPbpub0Bk04N8NLQIXR7pdAQkvTGbAOKsTol/WNLExsXcm6L
+vLEaeiKXawNCG58oZIcq+PSMFKVjTHCBAymSIJyD2ixilF326+NgI+h4LRd+/SeM
+QPtixqijbJpPet4V81LgjTpBiJn43h28haWQ8j1/rTCrjvKznZjVCHT+iD6OObx0
+ZhRQZPnZeLa4iBA6MD3M/rCofqZxP8QSpUhXfCQSP8SRDs7POCJ4SJSrIbK11Vf+
+qLdqrsghy2f+GYkCVgQTAQgAKQIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheA
+BQJlqDAVBQkH3qPwACEJEH538x4npK6iFiEEIP8NZrLQICwVRHM5fnfzHiekrqL7
+Bw/9GmvEcZx3xlCb2RK8K70AKaqlH7Q+yZt5GWXqivo4EI9g3C6pUU8SQaivyZNO
+e+9r8hYpsFin5OW/1G2pPdePiyCVkrjurLgTThcvqD0jWDVfLgP+i3IDnLHBIKPO
+kItY0H1sV7UF76lGAm5zizBJksghZJeb+FmeqW0LAFjc/0DVLJC1sR+c5kQeh74m
+MZ+uo7g4tCIc1uQJWpwbinKfvz/e2S/pHRwNak6Tb7ypybG7i7M2jmwLg1pw0VFs
+WF7FJCzGkYaymOG2ioAPF0yfvYJbUPQ+1g58wvZ1jBLdXj/T154uMeFyQcoCdHbV
+ZYWi7LknPqWMfuglnru3wkihDTaIZUy6lMuwv7QcbWiDBflGZAEODHizcSZLdjLX
+0/qAnwTLfTK7pkymnA7NcFprtaAPhjqGkDyJx1AWOdWyyYWykMX5RPMnIZUwXB0V
+yP4nhVVhs2NlGsM8n67BZszUVja2aO/JjvG8vCmwehFfNwdY7HNFqEYgwLevegbR
+NbXbQlJlRvlUINNKcoStvTZ6bmcdGN0njXOal1iLPAdrSa/gEDHCzb8WLpz/5xJG
+j7G1kMrbH8W6bOSfdsuSVHATO1g5JX06uDXGEucZiY66oIs2jawO8rfvLuh1seTW
+5a17KFFQYjajg7mAaOpGk/9eKozi0PbS/bP0L9mIc+o57yqJAlYEEwEIACkFAl+q
+v6UCGwMFCQWjmoAHCwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAhCRB+d/MeJ6Su
+ohYhBCD/DWay0CAsFURzOX538x4npK6i/vAP/AyI26i0aEyOJ+LFyIwvC8ouu1kB
+ZuFqVEK/7JnR/a/09ESJKmFsyUQs8izNE/nxMsinoqmjfSQ2nC/8CTntYEPz/XPI
+9zzWrnrZpB6oTi/zQr1PZHzYpm7ANq2spmf4kE1RbmhtKJqqabWr9kECVypQIRUf
+LqPXR23RVapwI5mckvgkFvwXJk7NNOFQvUF4MZ1jhLnFe4xxfoZVgeCydH2qZxv9
+EB5r0eKAXAZNfIzLyzj2xpdJlMWlBHdUm1l1NNLJsZNzFlfpYP16OGUfaNVFvEFc
+h38Kh/p0ldVBb73wOG8LXiWZB5IDzAmzgf9OfvdaLVJSzmcK6GAXs4/AEbFO990m
+NbYB1HZdCiYNx4jlSF/bdIN5WzF2NRapipv040Gnt4GCM1ZKc+J6WrX4OHsRyxcR
+6unlqJPaORpUctHpbb3A8Um7v0Z6WIVpCu71DhkG+oMCixZPrc+CALWIhNuc3A0G
+BMrAgvVjzoTmhDoDRRrlN8+7RNohQwm2ZjyBQxn1GgKGjpRaMMsPwlbqXUSuzBHM
+v71PbWymHi4J2aI9K1KpRj+wGO8bQjRC75MDCBm4NOcaH+gK12GCqmfK+5dOr1Xi
+5PAQXAzb0OCW/yLmguRRqo4YCfNhupLvcmm4M6ZHRnr5B6WNqP9o4GESXxourjAs
+6H5mF/ctKCc76pvK
+=O2Jb
+-----END PGP PUBLIC KEY BLOCK-----
