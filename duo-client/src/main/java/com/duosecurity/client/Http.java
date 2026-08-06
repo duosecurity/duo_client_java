@@ -1,5 +1,6 @@
 package com.duosecurity.client;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -16,7 +17,9 @@ import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-import okhttp3.CertificatePinner;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -54,147 +57,6 @@ public class Http {
   public static MediaType FORM_ENCODED = MediaType.parse("application/x-www-form-urlencoded");
   public static MediaType JSON_ENCODED = MediaType.parse("application/json");
 
-  private static final String[] DEFAULT_CA_CERTS = {
-      //Source URL: https://www.amazontrust.com/repository/AmazonRootCA1.cer
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=Amazon Root CA 1,O=Amazon,C=US
-      //Issuer: CN=Amazon Root CA 1,O=Amazon,C=US
-      //Expiration Date: 2038-01-17 00:00:00
-      //Serial Number: 66C9FCF99BF8C0A39E2F0788A43E696365BCA
-      //SHA256 Fingerprint: 8ecde6884f3d87b1125ba31ac3fcb13d7016de7f57cc904fe1cb97c6ae98196e
-      "sha256/++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=",
-      //Source URL: https://www.amazontrust.com/repository/AmazonRootCA2.cer
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=Amazon Root CA 2,O=Amazon,C=US
-      //Issuer: CN=Amazon Root CA 2,O=Amazon,C=US
-      //Expiration Date: 2040-05-26 00:00:00
-      //Serial Number: 66C9FD29635869F0A0FE58678F85B26BB8A37
-      //SHA256 Fingerprint: 1ba5b2aa8c65401a82960118f80bec4f62304d83cec4713a19c39c011ea46db4
-      "sha256/f0KW/FtqTjs108NpYj42SrGvOB2PpxIVM8nWxjPqJGE=",
-      //Source URL: https://www.amazontrust.com/repository/AmazonRootCA3.cer
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=Amazon Root CA 3,O=Amazon,C=US
-      //Issuer: CN=Amazon Root CA 3,O=Amazon,C=US
-      //Expiration Date: 2040-05-26 00:00:00
-      //Serial Number: 66C9FD5749736663F3B0B9AD9E89E7603F24A
-      //SHA256 Fingerprint: 18ce6cfe7bf14e60b2e347b8dfe868cb31d02ebb3ada271569f50343b46db3a4
-      "sha256/NqvDJlas/GRcYbcWE8S/IceH9cq77kg0jVhZeAPXq8k=",
-      //Source URL: https://www.amazontrust.com/repository/AmazonRootCA4.cer
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=Amazon Root CA 4,O=Amazon,C=US
-      //Issuer: CN=Amazon Root CA 4,O=Amazon,C=US
-      //Expiration Date: 2040-05-26 00:00:00
-      //Serial Number: 66C9FD7C1BB104C2943E5717B7B2CC81AC10E
-      //SHA256 Fingerprint: e35d28419ed02025cfa69038cd623962458da5c695fbdea3c22b0bfb25897092
-      "sha256/9+ze1cZgR9KO1kZrVDxA4HQ6voHRCSVNz4RdTCx4U8U=",
-      //Source URL: https://www.amazontrust.com/repository/SFSRootCAG2.cer
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=Starfield Services Root Certificate Authority - G2,
-      // O=Starfield Technologies\, Inc.,L=Scottsdale,ST=Arizona,C=US
-      //Issuer: CN=Starfield Services Root Certificate Authority - G2,
-      // O=Starfield Technologies\, Inc.,L=Scottsdale,ST=Arizona,C=US
-      //Expiration Date: 2037-12-31 23:59:59
-      //Serial Number: 0
-      //SHA256 Fingerprint: 568d6905a2c88708a4b3025190edcfedb1974a606a13c6e5290fcb2ae63edab5
-      "sha256/KwccWaCgrnaw6tsrrSO61FgLacNgG2MMLq8GE6+oP5I=",
-      //Source URL: https://cacerts.digicert.com/DigiCertHighAssuranceEVRootCA.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US
-      //Issuer: CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US
-      //Expiration Date: 2031-11-10 00:00:00
-      //Serial Number: 2AC5C266A0B409B8F0B79F2AE462577
-      //SHA256 Fingerprint: 7431e5f4c3c1ce4690774f0b61e05440883ba9a01ed00ba6abd7806ed3b118cf
-      "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=",
-      //Source URL: https://cacerts.digicert.com/DigiCertTLSECCP384RootG5.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=DigiCert TLS ECC P384 Root G5,O=DigiCert\, Inc.,C=US
-      //Issuer: CN=DigiCert TLS ECC P384 Root G5,O=DigiCert\, Inc.,C=US
-      //Expiration Date: 2046-01-14 23:59:59
-      //Serial Number: 9E09365ACF7D9C8B93E1C0B042A2EF3
-      //SHA256 Fingerprint: 018e13f0772532cf809bd1b17281867283fc48c6e13be9c69812854a490c1b05
-      "sha256/oC+voZLIy4HLE0FVT5wFtxzKKokLDRKY1oNkfJYe+98=",
-      //Source URL: https://cacerts.digicert.com/DigiCertTLSRSA4096RootG5.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=DigiCert TLS RSA4096 Root G5,O=DigiCert\, Inc.,C=US
-      //Issuer: CN=DigiCert TLS RSA4096 Root G5,O=DigiCert\, Inc.,C=US
-      //Expiration Date: 2046-01-14 23:59:59
-      //Serial Number: 8F9B478A8FA7EDA6A333789DE7CCF8A
-      //SHA256 Fingerprint: 371a00dc0533b3721a7eeb40e8419e70799d2b0a0f2c1d80693165f7cec4ad75
-      "sha256/ape1HIIZ6T5d7GS61YBs3rD4NVvkfnVwELcCRW4Bqv0=",
-      //Source URL: https://secure.globalsign.com/cacert/rootr46.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=GlobalSign Root R46,O=GlobalSign nv-sa,C=BE
-      //Issuer: CN=GlobalSign Root R46,O=GlobalSign nv-sa,C=BE
-      //Expiration Date: 2046-03-20 00:00:00
-      //Serial Number: 11D2BBB9D723189E405F0A9D2DD0DF2567D1
-      //SHA256 Fingerprint: 4fa3126d8d3a11d1c4855a4f807cbad6cf919d3a5a88b03bea2c6372d93c40c9
-      "sha256/rn+WLLnmp9v3uDP7GPqbcaiRdd+UnCMrap73yz3yu/w=",
-      //Source URL: https://secure.globalsign.com/cacert/roote46.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=GlobalSign Root E46,O=GlobalSign nv-sa,C=BE
-      //Issuer: CN=GlobalSign Root E46,O=GlobalSign nv-sa,C=BE
-      //Expiration Date: 2046-03-20 00:00:00
-      //Serial Number: 11D2BBBA336ED4BCE62468C50D841D98E843
-      //SHA256 Fingerprint: cbb9c44d84b8043e1050ea31a69f514955d7bfd2e2c6b49301019ad61d9f5058
-      "sha256/4EoCLOMvTM8sf2BGKHuCijKpCfXnUUR/g/0scfb9gXM=",
-      //Source URL: https://i.pki.goog/r2.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=GTS Root R2,O=Google Trust Services LLC,C=US
-      //Issuer: CN=GTS Root R2,O=Google Trust Services LLC,C=US
-      //Expiration Date: 2036-06-22 00:00:00
-      //Serial Number: 203E5AEC58D04251AAB1125AA
-      //SHA256 Fingerprint: 8d25cd97229dbf70356bda4eb3cc734031e24cf00fafcfd32dc76eb5841c7ea8
-      "sha256/Vfd95BwDeSQo+NUYxVEEIlvkOlWY2SalKK1lPhzOx78=",
-      //Source URL: https://i.pki.goog/r4.crt
-      //Certificate #1 Details:
-      //Original Format: DER
-      //Subject: CN=GTS Root R4,O=Google Trust Services LLC,C=US
-      //Issuer: CN=GTS Root R4,O=Google Trust Services LLC,C=US
-      //Expiration Date: 2036-06-22 00:00:00
-      //Serial Number: 203E5C068EF631A9C72905052
-      //SHA256 Fingerprint: 349dfa4058c5e263123b398ae795573c4e1313c83fe68f93556cd5e8031b3c7d
-      "sha256/mEflZT5enoR1FuXLgYYGqnVEoZvmf9c2bVBpiOjYQ0c=",
-      //Source URL: https://www.identrust.com/file-download/download/public/5718
-      //Certificate #1 Details:
-      //Original Format: PKCS7-DER
-      //Subject: CN=IdenTrust Commercial Root CA 1,O=IdenTrust,C=US
-      //Issuer: CN=IdenTrust Commercial Root CA 1,O=IdenTrust,C=US
-      //Expiration Date: 2034-01-16 18:12:23
-      //Serial Number: A0142800000014523C844B500000002
-      //SHA256 Fingerprint: 5d56499be4d2e08bcfcad08a3e38723d50503bde706948e42f55603019e528ae
-      "sha256/B+hU8mp8vTiZJ6oEG/7xts0h3RQ4GK2UfcZVqeWH/og=",
-      //Source URL: https://www.identrust.com/file-download/download/public/5842
-      //Certificate #1 Details:
-      //Original Format: PKCS7-PEM
-      //Subject: CN=IdenTrust Commercial Root TLS ECC CA 2,O=IdenTrust,C=US
-      //Issuer: CN=IdenTrust Commercial Root TLS ECC CA 2,O=IdenTrust,C=US
-      //Expiration Date: 2039-04-11 21:11:10
-      //Serial Number: 40018ECF000DE911D7447B73E4C1F82E
-      //SHA256 Fingerprint: 983d826ba9c87f653ff9e8384c5413e1d59acf19ddc9c98cecae5fdea2ac229c
-      "sha256/uu5PB+MS9L3/ffB/PuTG6A+WjsTtTaF52qqjrcHFXRU=",
-      //Source URL: https://ssl-ccp.secureserver.net/repository/sfroot-g2.crt
-      //Certificate #1 Details:
-      //Original Format: PEM
-      //Subject: CN=Starfield Root Certificate Authority - G2,
-      // O=Starfield Technologies\, Inc.,L=Scottsdale,ST=Arizona,C=US
-      //Issuer: CN=Starfield Root Certificate Authority - G2,
-      // O=Starfield Technologies\, Inc.,L=Scottsdale,ST=Arizona,C=US
-      //Expiration Date: 2037-12-31 23:59:59
-      //Serial Number: 0
-      //SHA256 Fingerprint: 2ce1cb0bf9d2f9e102993fbe215152c3b2dd0cabde1c68e5319b839154dbb7f5
-      "sha256/gI1os/q0iEpflxrOfRBVDXqVoWN3Tz7Dav/7IT++THQ=",
-  };
 
   /**
    * Http constructor.
@@ -227,13 +89,15 @@ public class Http {
     headers.add("user-agent", String.format("%s ca_bundle/%s (ca_pinning=%s)",
         UserAgentString, CA_BUNDLE_VERSION, "enabled"));
 
-    CertificatePinner pinner = Util.createPinner(host, DEFAULT_CA_CERTS);
+    TrustManagerFactory tmf = CertificateUtils.createDefaultTrustManagerFactory();
+    SSLSocketFactory sslFactory = CertificateUtils.createSslSocketFactory(tmf);
+    X509TrustManager trustManager = CertificateUtils.getX509TrustManager(tmf);
 
     httpClient = new OkHttpClient.Builder()
         .connectTimeout(timeout, TimeUnit.SECONDS)
         .writeTimeout(timeout, TimeUnit.SECONDS)
         .readTimeout(timeout, TimeUnit.SECONDS)
-        .certificatePinner(pinner)
+        .sslSocketFactory(sslFactory, trustManager)
         .build();
   }
 
@@ -435,13 +299,17 @@ public class Http {
   }
 
   /**
-   * Use custom CA certificates for certificate pinning.
+   * Use custom CA certificates for the trust store.
    *
-   * @param customCaCerts The CA certificates to pin
+   * @param pemStream InputStream containing PEM-encoded CA certificates
    */
-  public void useCustomCertificates(String[] customCaCerts) {
-    CertificatePinner pinner = Util.createPinner(host, customCaCerts);
-    httpClient = httpClient.newBuilder().certificatePinner(pinner).build();
+  public void useCustomCertificates(InputStream pemStream) {
+    TrustManagerFactory tmf = CertificateUtils.createTrustManagerFactory(pemStream);
+    SSLSocketFactory sslFactory = CertificateUtils.createSslSocketFactory(tmf);
+    X509TrustManager trustManager = CertificateUtils.getX509TrustManager(tmf);
+    httpClient = httpClient.newBuilder()
+        .sslSocketFactory(sslFactory, trustManager)
+        .build();
   }
 
   /**
@@ -449,8 +317,11 @@ public class Http {
    * via the OS trust store.
    */
   public void disableCaPinning() {
+    TrustManagerFactory tmf = CertificateUtils.getSystemTrustManagerFactory();
+    SSLSocketFactory sslFactory = CertificateUtils.createSslSocketFactory(tmf);
+    X509TrustManager trustManager = CertificateUtils.getX509TrustManager(tmf);
     httpClient = httpClient.newBuilder()
-        .certificatePinner(CertificatePinner.DEFAULT)
+        .sslSocketFactory(sslFactory, trustManager)
         .build();
   }
 
@@ -558,7 +429,7 @@ public class Http {
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
     private long maxBackoffMs = MAX_BACKOFF_MS;
-    private String[] caCerts = null;
+    private InputStream customCertsStream = null;
     private boolean disableCaPinning = false;
     private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
     private Map<String, String> headers = new HashMap<String, String>();
@@ -615,13 +486,13 @@ public class Http {
     }
 
     /**
-     * Provide custom CA certificates for certificate pinning.
+     * Provide custom CA certificates for the trust store.
      *
-     * @param customCaCerts The CA certificates to pin to
+     * @param pemStream InputStream containing PEM-encoded CA certificates
      * @return the Builder
      */
-    public ClientBuilder<T> useCustomCertificates(String[] customCaCerts) {
-      this.caCerts = customCaCerts;
+    public ClientBuilder<T> useCustomCertificates(InputStream pemStream) {
+      this.customCertsStream = pemStream;
 
       return this;
     }
@@ -672,14 +543,14 @@ public class Http {
      * @return the specified Http client object
      */
     public T build() {
-      if (disableCaPinning && caCerts != null) {
+      if (disableCaPinning && customCertsStream != null) {
         throw new IllegalStateException(
             "Cannot both disable CA pinning and provide custom certificates");
       }
       T duoClient = createClient(method, host, uri, timeout);
       duoClient.setMaxBackoffMs(maxBackoffMs);
-      if (caCerts != null) {
-        duoClient.useCustomCertificates(caCerts);
+      if (customCertsStream != null) {
+        duoClient.useCustomCertificates(customCertsStream);
       }
       if (disableCaPinning) {
         duoClient.disableCaPinning();
