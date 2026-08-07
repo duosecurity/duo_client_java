@@ -3,10 +3,7 @@ package com.duosecurity.client;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import javax.net.ssl.SSLSocketFactory;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
@@ -47,22 +44,18 @@ public class HttpDisableCaPinningTest {
 
   @Test(expected = IllegalStateException.class)
   public void testDisableAndCustomCerts_throws() {
-    InputStream pemStream = new ByteArrayInputStream(
-        "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----"
-            .getBytes(StandardCharsets.UTF_8));
+    String pemContent = "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----";
     new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
         .disableCaPinning()
-        .useCustomCertificates(pemStream)
+        .useCustomCertificates(pemContent)
         .build();
   }
 
   @Test(expected = IllegalStateException.class)
   public void testCustomCertsAndDisable_throws() {
-    InputStream pemStream = new ByteArrayInputStream(
-        "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----"
-            .getBytes(StandardCharsets.UTF_8));
+    String pemContent = "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----";
     new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
-        .useCustomCertificates(pemStream)
+        .useCustomCertificates(pemContent)
         .disableCaPinning()
         .build();
   }

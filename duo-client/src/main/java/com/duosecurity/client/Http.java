@@ -1,6 +1,5 @@
 package com.duosecurity.client;
 
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -301,10 +300,10 @@ public class Http {
   /**
    * Use custom CA certificates for the trust store.
    *
-   * @param pemStream InputStream containing PEM-encoded CA certificates
+   * @param pemContent PEM-encoded CA certificates as a String
    */
-  public void useCustomCertificates(InputStream pemStream) {
-    TrustManagerFactory tmf = CertificateUtils.createTrustManagerFactory(pemStream);
+  public void useCustomCertificates(String pemContent) {
+    TrustManagerFactory tmf = CertificateUtils.createTrustManagerFactory(pemContent);
     SSLSocketFactory sslFactory = CertificateUtils.createSslSocketFactory(tmf);
     X509TrustManager trustManager = CertificateUtils.getX509TrustManager(tmf);
     httpClient = httpClient.newBuilder()
@@ -429,7 +428,7 @@ public class Http {
 
     private int timeout = DEFAULT_TIMEOUT_SECS;
     private long maxBackoffMs = MAX_BACKOFF_MS;
-    private InputStream customCertsStream = null;
+    private String customCertsContent = null;
     private boolean disableCaPinning = false;
     private SortedMap<String, String> additionalDuoHeaders = new TreeMap<String, String>();
     private Map<String, String> headers = new HashMap<String, String>();
@@ -488,11 +487,11 @@ public class Http {
     /**
      * Provide custom CA certificates for the trust store.
      *
-     * @param pemStream InputStream containing PEM-encoded CA certificates
+     * @param pemContent PEM-encoded CA certificates as a String
      * @return the Builder
      */
-    public ClientBuilder<T> useCustomCertificates(InputStream pemStream) {
-      this.customCertsStream = pemStream;
+    public ClientBuilder<T> useCustomCertificates(String pemContent) {
+      this.customCertsContent = pemContent;
 
       return this;
     }
@@ -543,14 +542,14 @@ public class Http {
      * @return the specified Http client object
      */
     public T build() {
-      if (disableCaPinning && customCertsStream != null) {
+      if (disableCaPinning && customCertsContent != null) {
         throw new IllegalStateException(
             "Cannot both disable CA pinning and provide custom certificates");
       }
       T duoClient = createClient(method, host, uri, timeout);
       duoClient.setMaxBackoffMs(maxBackoffMs);
-      if (customCertsStream != null) {
-        duoClient.useCustomCertificates(customCertsStream);
+      if (customCertsContent != null) {
+        duoClient.useCustomCertificates(customCertsContent);
       }
       if (disableCaPinning) {
         duoClient.disableCaPinning();
