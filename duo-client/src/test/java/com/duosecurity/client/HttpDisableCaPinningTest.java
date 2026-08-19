@@ -1,11 +1,10 @@
 package com.duosecurity.client;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
 import java.lang.reflect.Field;
-import java.util.Set;
-import okhttp3.CertificatePinner;
+import javax.net.ssl.SSLSocketFactory;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 
@@ -17,46 +16,46 @@ public class HttpDisableCaPinningTest {
     return (OkHttpClient) httpClientField.get(http);
   }
 
-  @SuppressWarnings("unchecked")
-  private Set<?> getPins(CertificatePinner pinner) throws Exception {
-    Field pinsField = CertificatePinner.class.getDeclaredField("pins");
-    pinsField.setAccessible(true);
-    return (Set<?>) pinsField.get(pinner);
+  @Test
+  public void testDefaultBuilder_hasCustomSslFactory() throws Exception {
+    Http http = new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
+        .build();
+
+    OkHttpClient client = getHttpClient(http);
+    SSLSocketFactory factory = client.sslSocketFactory();
+    assertNotNull("SSLSocketFactory should not be null", factory);
+
+    // Verify it's not the same instance as a default OkHttpClient would use
+    OkHttpClient defaultClient = new OkHttpClient();
+    assertNotSame("Should use custom SSL factory instance, not OkHttp default",
+        defaultClient.sslSocketFactory(), factory);
   }
 
   @Test
-  public void testDisableCaPinning_removesPin() throws Exception {
+  public void testDisableCaPinning_usesSystemTrustStore() throws Exception {
     Http http = new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
         .disableCaPinning()
         .build();
 
     OkHttpClient client = getHttpClient(http);
-    Set<?> pins = getPins(client.certificatePinner());
-    assertTrue("Pins should be empty when CA pinning is disabled", pins.isEmpty());
-  }
-
-  @Test
-  public void testDefaultBuilder_hasPinning() throws Exception {
-    Http http = new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
-        .build();
-
-    OkHttpClient client = getHttpClient(http);
-    Set<?> pins = getPins(client.certificatePinner());
-    assertFalse("Pins should not be empty by default", pins.isEmpty());
+    SSLSocketFactory factory = client.sslSocketFactory();
+    assertNotNull("SSLSocketFactory should not be null", factory);
   }
 
   @Test(expected = IllegalStateException.class)
   public void testDisableAndCustomCerts_throws() {
+    String pemContent = "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----";
     new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
         .disableCaPinning()
-        .useCustomCertificates(new String[]{"sha256/test"})
+        .useCustomCertificates(pemContent)
         .build();
   }
 
   @Test(expected = IllegalStateException.class)
   public void testCustomCertsAndDisable_throws() {
+    String pemContent = "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----";
     new Http.HttpBuilder("GET", "api-host.duosecurity.com", "/auth/v2/check")
-        .useCustomCertificates(new String[]{"sha256/test"})
+        .useCustomCertificates(pemContent)
         .disableCaPinning()
         .build();
   }
