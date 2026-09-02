@@ -35,7 +35,7 @@ public class Http {
   private static final int RATE_LIMIT_ERROR_CODE = 429;
 
   private static final String CA_BUNDLE_VERSION = "1.0";
-  public static final String UserAgentString = "Duo API Java/0.9.0";
+  public static final String UserAgentString = "Duo API Java/0.9.1-SNAPSHOT";
 
   private final String method;
   private final String host;
